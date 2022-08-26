@@ -2,8 +2,9 @@ pub mod schema;
 use crate::models::NewFrame;
 pub mod models;
 use anyhow::Result;
-use chrono::NaiveDateTime;
+use chrono::{Local, NaiveDateTime};
 use clap::{ArgMatches, Command};
+use config::load_config;
 use diesel::prelude::*;
 use diesel::sqlite::SqliteConnection;
 use uuid::Uuid;
@@ -14,7 +15,7 @@ mod config;
 extern crate diesel;
 
 pub fn establish_connection() -> SqliteConnection {
-    let cfg = config::load_config();
+    let cfg = load_config();
 
     if cfg.is_err() {
         panic!("Config could not be loaded");
@@ -69,6 +70,24 @@ pub fn start_frame(conn: &SqliteConnection, start: &NaiveDateTime, project: &str
         .values(&new_frame)
         .execute(conn)
         .expect("Error saving new frame");
+}
+
+pub fn ago(ago: NaiveDateTime) -> String {
+    let now = Local::now().naive_local();
+
+    let duration = now - ago;
+
+    if duration.num_days() != 0 {
+        return format!("{} days ago", duration.num_days());
+    } else if duration.num_hours() != 0 {
+        return format!("{} hours ago", duration.num_hours());
+    } else if duration.num_minutes() != 0 {
+        return format!("{} minutes ago", duration.num_minutes());
+    } else if duration.num_seconds() != 0 {
+        return format!("{} seconds ago", duration.num_seconds());
+    } else {
+        return format!("just now");
+    }
 }
 
 trait AppCommand {

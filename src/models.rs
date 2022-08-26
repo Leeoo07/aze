@@ -1,7 +1,7 @@
 use super::schema::frames;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
-#[derive(Queryable, Clone)]
+#[derive(Queryable, Clone, Identifiable)]
 pub struct Frame {
     pub id: String,
     pub start: NaiveDateTime,

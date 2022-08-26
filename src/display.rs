@@ -30,3 +30,70 @@ impl Display {
         return duration;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use chrono::{Local, NaiveDate, NaiveDateTime};
+    use mycroft::models::Frame;
+
+    use super::Display;
+
+    #[test]
+    fn can_add_multiple_frames() {
+        let frame1 = Frame {
+            id: "1".to_string(),
+            start: Local::now().naive_local(),
+            end: Some(Local::now().naive_local()),
+            last_update: Local::now().naive_local(),
+            project: "1".to_string(),
+            deleted: false,
+        };
+
+        let frame2 = Frame {
+            id: "2".to_string(),
+            start: Local::now().naive_local(),
+            end: Some(Local::now().naive_local()),
+            last_update: Local::now().naive_local(),
+            project: "1".to_string(),
+            deleted: false,
+        };
+
+        let display = Display {
+            date: Local::now().date().naive_local(),
+            frames: vec![frame1, frame2],
+        };
+
+        assert_eq!(display.frames.len(), 2);
+    }
+
+    #[test]
+    fn duration_from_multiple_frames() {
+        let start: NaiveDateTime = NaiveDate::from_ymd(2001, 1, 1).and_hms(10, 0, 0);
+        let end: NaiveDateTime = NaiveDate::from_ymd(2001, 1, 1).and_hms(11, 0, 0);
+
+        let frame1 = Frame {
+            id: "1".to_string(),
+            start,
+            end: Some(end),
+            last_update: Local::now().naive_local(),
+            project: "1".to_string(),
+            deleted: false,
+        };
+
+        let frame2 = Frame {
+            id: "2".to_string(),
+            start,
+            end: Some(end),
+            last_update: Local::now().naive_local(),
+            project: "1".to_string(),
+            deleted: false,
+        };
+
+        let mut display = Display {
+            date: Local::now().date().naive_local(),
+            frames: vec![frame1, frame2],
+        };
+
+        assert_eq!(2, display.total_duration().num_hours());
+    }
+}

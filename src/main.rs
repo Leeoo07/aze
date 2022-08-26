@@ -4,7 +4,10 @@ use chrono::{format::ParseError, NaiveDateTime};
 use chrono::{Datelike, Duration, Local, NaiveDate};
 use clap::{Arg, ArgAction, Command};
 
+use anyhow::anyhow;
 use anyhow::Result;
+use diesel::OptionalExtension;
+use mycroft::ago;
 use mycroft::{create_frame, establish_connection, models::Frame, start_frame};
 
 use crate::diesel::ExpressionMethods;
@@ -19,14 +22,16 @@ fn main() -> Result<()> {
     use mycroft::schema::frames::dsl::*;
 
     let matches = Command::new("mycroft")
-        .about("Mycroft is a tool aimed at helping you monitoring time.")
-        .version("0.1.0")
+        .about("Mycroft is a tool aimed at helping you monitoring time.\n\nYou just have to tell Mycroft when you start working on your project with the `start` command, and you can stop the timer when you're done with the `stop` command.")
+        .version(clap::crate_version!())
+        .author(clap::crate_authors!())
         .subcommand_required(true)
         .arg_required_else_help(true)
-        .author("kreemer")
+        .arg(Arg::new("color").long("color").conflicts_with("no-color").help("Color output").global(true))
+        .arg(Arg::new("no-color").long("no-color").conflicts_with("color").help("Don't color output").global(true))
         .subcommand(
             Command::new("add")
-                .about("Add time to a project with tag(s) that was not tracked live.")
+                .about("Add time to a project with tag(s) that was not tracked live.\n\nExample:\n\n$ mycroft add --from \"2018-03-20 12:00:00\" --to \"2018-03-20 13:00:00\" \\\n programming +addfeature")
                 .arg(
                     Arg::new("from")
                         .short('f')
@@ -47,10 +52,26 @@ fn main() -> Result<()> {
                 )
                 .arg(
                     Arg::new("project")
-                        .help("Name of the project")
+                        .help("Name of the project.")
                         .action(ArgAction::Set)
                         .required(true),
-                ),
+                )
+                .arg(
+                    Arg::new("confirm-new-project")
+                        .long("confirm-new-project")
+                        .short('c')
+                        .help("Confirm addition of new project.")
+                        .action(ArgAction::SetTrue)
+                        .required(false),
+                )
+                .arg(
+                    Arg::new("confirm-new-tag")
+                        .long("confirm-new-tag")
+                        .short('b')
+                        .help("Confirm creation of new tag.")
+                        .action(ArgAction::SetTrue)
+                        .required(false),
+                )
         )
         .subcommand(
             Command::new("start").about("Start new activity.")
@@ -82,6 +103,9 @@ fn main() -> Result<()> {
             ),
         )
         .subcommand(
+            Command::new("status").about("Display when the current project was started and the time spent since.")
+        )
+        .subcommand(
             Command::new("log").about("Display each recorded session during the given timespan.").arg(
                 Arg::new("project")
                     .short('p')
@@ -104,6 +128,13 @@ fn main() -> Result<()> {
                 .get_one::<String>("project")
                 .expect("required");
 
+            let confirm_project = command_matches
+                .get_one::<bool>("confirm-new-project")
+                .expect("required");
+
+            if *confirm_project {
+                println!("cp {}", confirm_project);
+            }
             println!(
                 "starting project {} from {} to {}",
                 p,
@@ -115,11 +146,13 @@ fn main() -> Result<()> {
             create_frame(&conn, f, t, p);
         }
         Some(("start", command_matches)) => {
-            let p = command_matches
-                .get_one::<String>("project")
-                .expect("required");
-
+            let p = command_matches.get_one::<String>("project");
             let at = command_matches.get_one::<NaiveDateTime>("at");
+
+            if p.is_none() {
+                return Err(anyhow!("No project given"));
+            }
+            let project_string = p.unwrap();
 
             let now = Local::now().naive_local();
             let started_at: &NaiveDateTime;
@@ -151,13 +184,74 @@ fn main() -> Result<()> {
             } else {
                 println!(
                     "starting project {} at {}",
-                    p,
+                    project_string,
                     started_at.format("%d.%m.%Y %H:%M"),
                 );
-                start_frame(&conn, started_at, p);
+                start_frame(&conn, started_at, project_string);
             }
         }
-        Some(("log", command_matches)) => {
+        Some(("stop", command_matches)) => {
+            let at = command_matches.get_one::<NaiveDateTime>("at");
+
+            let now = Local::now().naive_local();
+            let started_at: &NaiveDateTime;
+            if at.is_some() {
+                started_at = at.unwrap();
+            } else {
+                started_at = &now;
+            }
+
+            let conn = establish_connection();
+
+            let result = frames
+                .filter(deleted.eq(false))
+                .filter(end.is_null())
+                .order_by(start.desc())
+                .first::<Frame>(&conn)
+                .optional()
+                .expect("Error loading frames");
+
+            if result.is_none() {
+                println!("No project started.");
+            } else {
+                let frame = result.unwrap();
+                let _result = diesel::update(&frame)
+                    .set(end.eq(started_at))
+                    .execute(&conn);
+
+                println!(
+                    "Stopping project {}, started {} and stopped {}",
+                    frame.project,
+                    ago(frame.start),
+                    ago(started_at.to_owned())
+                );
+            }
+        }
+        Some(("status", _command_matches)) => {
+            let conn = establish_connection();
+
+            let result = frames
+                .filter(deleted.eq(false))
+                .filter(end.is_null())
+                .order_by(start.desc())
+                .first::<Frame>(&conn)
+                .optional()
+                .expect("Error loading frames");
+
+            if result.is_none() {
+                println!("No project started.");
+            } else {
+                let frame = result.unwrap();
+
+                println!(
+                    "Project {} started {} ({})",
+                    frame.project,
+                    ago(frame.start),
+                    frame.start.format("%d.%m.%Y %H:%M")
+                );
+            }
+        }
+        Some(("log", _command_matches)) => {
             let conn = establish_connection();
 
             let last_week = (Local::now() - Duration::weeks(1)).naive_utc();
