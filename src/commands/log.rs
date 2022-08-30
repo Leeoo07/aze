@@ -3,13 +3,13 @@ use chrono::Datelike;
 use chrono::Duration;
 use chrono::Local;
 use chrono::NaiveDate;
-use mycroft::establish_connection;
+use mycroft::database::establish_connection;
+use mycroft::display::Display;
 use mycroft::models::Frame;
 
 use crate::diesel::ExpressionMethods;
 use crate::diesel::QueryDsl;
 use crate::diesel::RunQueryDsl;
-use crate::display::Display;
 
 use super::MyCommand;
 

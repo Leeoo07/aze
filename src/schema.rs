@@ -5,6 +5,7 @@ table! {
         end -> Nullable<Timestamp>,
         last_update -> Timestamp,
         project -> Text,
+        tags -> Text,
         deleted -> Bool,
     }
 }

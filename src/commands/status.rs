@@ -5,7 +5,7 @@ use crate::diesel::RunQueryDsl;
 use anyhow::Result;
 use diesel::OptionalExtension;
 use mycroft::ago;
-use mycroft::establish_connection;
+use mycroft::database::establish_connection;
 use mycroft::models::Frame;
 
 #[derive(clap::Args, Debug)]

@@ -1,7 +1,8 @@
 use std::ops::Add;
 
 use chrono::{Duration, NaiveDate};
-use mycroft::models::Frame;
+
+use crate::models::Frame;
 
 #[derive(Clone)]
 pub struct Display {
@@ -33,19 +34,22 @@ impl Display {
 
 #[cfg(test)]
 mod tests {
+    use crate::{database::MyJsonType, models::Frame};
     use chrono::{Local, NaiveDate, NaiveDateTime};
-    use mycroft::models::Frame;
 
     use super::Display;
 
     #[test]
     fn can_add_multiple_frames() {
+        use serde_json::json;
+
         let frame1 = Frame {
             id: "1".to_string(),
             start: Local::now().naive_local(),
             end: Some(Local::now().naive_local()),
             last_update: Local::now().naive_local(),
             project: "1".to_string(),
+            tags: MyJsonType(json!({})),
             deleted: false,
         };
 
@@ -55,6 +59,7 @@ mod tests {
             end: Some(Local::now().naive_local()),
             last_update: Local::now().naive_local(),
             project: "1".to_string(),
+            tags: MyJsonType(json!({})),
             deleted: false,
         };
 
@@ -68,15 +73,16 @@ mod tests {
 
     #[test]
     fn duration_from_multiple_frames() {
+        use serde_json::json;
         let start: NaiveDateTime = NaiveDate::from_ymd(2001, 1, 1).and_hms(10, 0, 0);
         let end: NaiveDateTime = NaiveDate::from_ymd(2001, 1, 1).and_hms(11, 0, 0);
-
         let frame1 = Frame {
             id: "1".to_string(),
             start,
             end: Some(end),
             last_update: Local::now().naive_local(),
             project: "1".to_string(),
+            tags: MyJsonType(json!({})),
             deleted: false,
         };
 
@@ -86,6 +92,7 @@ mod tests {
             end: Some(end),
             last_update: Local::now().naive_local(),
             project: "1".to_string(),
+            tags: MyJsonType(json!({})),
             deleted: false,
         };
 

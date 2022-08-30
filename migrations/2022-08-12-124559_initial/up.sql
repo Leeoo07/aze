@@ -5,5 +5,6 @@ create table if not exists frames (
     end datetime DEFAULT null,
     last_update datetime not null,
     project varchar(255) not null,
+    tags varchar(2048) not null,
     deleted boolean not null
 );

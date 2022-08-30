@@ -5,7 +5,7 @@ use anyhow::Result;
 use chrono::{Local, NaiveDateTime};
 use diesel::OptionalExtension;
 use mycroft::ago;
-use mycroft::establish_connection;
+use mycroft::database::establish_connection;
 use mycroft::models::Frame;
 
 use super::MyCommand;

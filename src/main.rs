@@ -11,7 +11,6 @@ use commands::stop::StopSubcommand;
 use commands::MyCommand;
 pub mod commands;
 mod config;
-mod display;
 
 #[derive(Debug, Parser)]
 #[clap(name = "Mycroft")]
