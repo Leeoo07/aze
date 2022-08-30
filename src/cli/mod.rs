@@ -3,11 +3,12 @@ use chrono::ParseError;
 use dialoguer::theme::ColorfulTheme;
 use dialoguer::Confirm;
 
+use crate::config::load_config;
 use crate::service::project::has_project;
 use crate::service::tags::has_tag;
 
 pub fn parse_to_datetime(s: &str) -> Result<NaiveDateTime, ParseError> {
-    return NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S");
+    return NaiveDateTime::parse_from_str(s, &load_config().datetime_format);
 }
 pub fn convert_tags(v: &str) -> Result<String, String> {
     if !v.starts_with("+") {

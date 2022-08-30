@@ -12,10 +12,7 @@ use diesel::{Connection, SqliteConnection};
 pub fn establish_connection() -> SqliteConnection {
     let cfg = load_config();
 
-    if cfg.is_err() {
-        panic!("Config could not be loaded");
-    }
-    let path = cfg.unwrap().data_dir + &std::path::MAIN_SEPARATOR.to_string() + "frames.db";
+    let path = cfg.data_dir + &std::path::MAIN_SEPARATOR.to_string() + "frames.db";
 
     return SqliteConnection::establish(&path).expect(&format!("Error connecting to {}", &path));
 }
@@ -23,6 +20,26 @@ pub fn establish_connection() -> SqliteConnection {
 #[derive(Debug, AsExpression, FromSqlRow, Clone, PartialEq, Eq)]
 #[sql_type = "Text"]
 pub struct MyJsonType(pub serde_json::Value);
+
+impl MyJsonType {
+    pub fn values(&self) -> Vec<String> {
+        if !self.0.is_array() {
+            return vec![];
+        }
+
+        let array = self.0.as_array().unwrap();
+        let mut vec: Vec<String> = vec![];
+
+        for item in array {
+            if !item.is_string() {
+                continue;
+            }
+
+            vec.push(item.as_str().unwrap().trim_matches('"').to_string());
+        }
+        return vec;
+    }
+}
 
 impl FromSql<Text, Sqlite> for MyJsonType {
     fn from_sql(

@@ -1,11 +1,12 @@
 use anyhow::Result;
 use confy::ConfyError;
-use directories::ProjectDirs;
+use directories_next::ProjectDirs;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AppConfig {
     pub data_dir: String,
+    pub datetime_format: String,
 }
 
 impl Default for AppConfig {
@@ -13,6 +14,7 @@ impl Default for AppConfig {
         if let Some(proj_dirs) = ProjectDirs::from("ch", "lethani", "mycroft") {
             return AppConfig {
                 data_dir: proj_dirs.data_dir().to_str().unwrap().to_string(),
+                datetime_format: "%Y-%m-%d %H:%M".to_string(),
             };
         }
 
@@ -20,29 +22,24 @@ impl Default for AppConfig {
     }
 }
 
-#[allow(dead_code)]
-pub fn load_config() -> Result<AppConfig> {
+pub fn load_config() -> AppConfig {
     let cfg: Result<AppConfig, ConfyError> = confy::load("mycroft");
 
-    return Ok(cfg.unwrap());
+    return cfg.unwrap_or(AppConfig::default());
 }
 
 #[cfg(test)]
 mod tests {
-    use directories::ProjectDirs;
+    use directories_next::ProjectDirs;
 
     #[test]
     fn default_config_dir() {
         let config = super::load_config();
 
-        if config.is_err() {
-            panic!("config is not loadable");
-        }
-
         if let Some(proj_dirs) = ProjectDirs::from("ch", "lethani", "mycroft") {
             assert_eq!(
                 proj_dirs.data_dir().to_str().unwrap().to_string(),
-                config.unwrap().data_dir
+                config.data_dir
             );
         } else {
             panic!("Could not evaluate directory");
