@@ -2,7 +2,6 @@ use anyhow::anyhow;
 use anyhow::Result;
 use chrono::NaiveDateTime;
 use colored::Colorize;
-use dialoguer::{theme::ColorfulTheme, Confirm};
 use mycroft::cli::convert_tags;
 use mycroft::cli::parse_to_datetime;
 use mycroft::cli::process_project;
@@ -10,7 +9,6 @@ use mycroft::cli::process_tags;
 use mycroft::database::establish_connection;
 use mycroft::service::frame::create_frame;
 use mycroft::service::frame::frame_collides;
-use mycroft::service::project::has_project;
 
 use super::MyCommand;
 
@@ -51,22 +49,8 @@ pub struct AddSubcommand {
 
 impl MyCommand for AddSubcommand {
     fn run(&self) -> Result<()> {
-        if self.confirm_project && !has_project(self.project.to_string()) {
-            if !Confirm::with_theme(&ColorfulTheme::default())
-                .with_prompt(format!(
-                    "Project '{}' does not exist yet. Create it?",
-                    self.project
-                ))
-                .default(false)
-                .interact()
-                .unwrap()
-            {
-                return Err(anyhow!("Aborted!"));
-            }
-        }
-
-        process_tags(self.tags.to_owned(), self.confirm_tags);
         process_project(self.project.to_string(), self.confirm_project);
+        process_tags(self.tags.to_owned(), self.confirm_tags);
 
         if frame_collides(&self.from, &self.to) {
             return Err(anyhow!(

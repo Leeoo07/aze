@@ -12,7 +12,14 @@ use diesel::{Connection, SqliteConnection};
 pub fn establish_connection() -> SqliteConnection {
     let cfg = load_config();
 
-    let path = cfg.data_dir + &std::path::MAIN_SEPARATOR.to_string() + "frames.db";
+    let base_path = cfg.data_dir + &std::path::MAIN_SEPARATOR.to_string();
+
+    let path: String;
+    if !cfg!(test) {
+        path = base_path + "frames.db";
+    } else {
+        path = base_path + "frames_test.db";
+    }
 
     return SqliteConnection::establish(&path).expect(&format!("Error connecting to {}", &path));
 }

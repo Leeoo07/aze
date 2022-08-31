@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use anyhow::Result;
 use chrono::{Local, NaiveDateTime};
+use colored::Colorize;
 use mycroft::cli::convert_tags;
 use mycroft::cli::parse_to_datetime;
 use mycroft::cli::process_project;
@@ -14,25 +15,54 @@ use mycroft::service::frame::start_frame;
 use super::MyCommand;
 
 #[derive(clap::Args, Debug)]
+#[clap(
+    about = "Start monitoring time for the given project.",
+    after_help = "Example:\n\n$ mycroft start apollo11 +module +brakes --no-gap\nStarting project apollo11 [module, brakes] at 16:34"
+)]
 pub struct StartSubcommand {
+    #[clap(help = "Name of the project which should be used to add time.")]
     pub project: String,
 
-    #[clap(value_parser = convert_tags)]
+    #[clap(help = "Tag(s) which should be added to the activity. Each tag has to be prepended with a plus sign.", value_parser = convert_tags)]
     pub tags: Vec<String>,
 
-    #[clap(long = "at", value_parser = parse_to_datetime)]
+    #[clap(help = "Start frame at this time.", display_order = 1, long = "at", value_parser = parse_to_datetime)]
     pub at: Option<NaiveDateTime>,
 
-    #[clap(short = 'c', long = "confirm-new-project")]
+    #[clap(
+        short = 'c',
+        display_order = 4,
+        help = "Confirm addition of new project.",
+        long = "confirm-new-project"
+    )]
     pub confirm_project: bool,
 
-    #[clap(short = 'b', long = "confirm-new-tags")]
+    #[clap(
+        short = 'b',
+        display_order = 5,
+        help = "Confirm addition of new tag.",
+        long = "confirm-new-tags"
+    )]
     pub confirm_tags: bool,
 
-    #[clap(name = "gap", short = 'g', long = "gap", conflicts_with = "no_gap")]
+    #[clap(
+        name = "gap",
+        help = "Leave gap between end time of previous project and start time of the current.",
+        short = 'g',
+        long = "gap",
+        display_order = 2,
+        conflicts_with = "no_gap"
+    )]
     pub gap: bool,
 
-    #[clap(name = "no_gap", short = 'G', long = "no-gap", conflicts_with_all = &["gap", "at"])]
+    #[clap(
+        name = "no_gap", 
+        help = "Don't leave gap between end time of previous project and start time of the current.", 
+        short = 'G', 
+        long = "no-gap",
+        display_order = 3,
+        conflicts_with_all = &["gap", "at"]
+    )]
     pub no_gap: bool,
 }
 
@@ -46,6 +76,7 @@ impl MyCommand for StartSubcommand {
         let started_at: NaiveDateTime;
         if at.is_some() {
             started_at = at.unwrap();
+            // TODO: check if at is in the future
         } else if self.no_gap {
             let last_finished = last_finished_frame(&conn);
             if last_finished.is_none() {
@@ -68,23 +99,22 @@ impl MyCommand for StartSubcommand {
             )));
         }
 
-        let mut confirm = process_project(self.project.to_string(), self.confirm_project);
-        if !confirm {
+        if !process_project(self.project.to_string(), self.confirm_project) {
             return Err(anyhow!("Aborted!"));
         }
-        confirm = process_tags(self.tags.to_owned(), self.confirm_tags);
-        if !confirm {
+        if !process_tags(self.tags.to_owned(), self.confirm_tags) {
             return Err(anyhow!("Aborted!"));
         }
+
         println!(
             "starting project {}{} at {}",
-            project_string,
+            project_string.purple(),
             if self.tags.len() > 0 {
-                format!(" [{}]", self.tags.join(", "))
+                format!(" [{}]", self.tags.join(", ").blue())
             } else {
                 "".to_string()
             },
-            started_at.format("%d.%m.%Y %H:%M"),
+            started_at.format("%d.%m.%Y %H:%M").to_string().cyan(),
         );
 
         start_frame(&conn, &started_at, &project_string, self.tags.to_owned());
