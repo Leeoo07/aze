@@ -16,7 +16,7 @@ pub struct StopSubcommand {
 }
 
 impl MyCommand for StopSubcommand {
-    fn run(&self) -> Result<()> {
+    fn run(&self, output: super::Output) -> Result<()> {
         use mycroft::schema::frames::dsl::*;
 
         let at = self.at;
@@ -29,31 +29,32 @@ impl MyCommand for StopSubcommand {
             started_at = now;
         }
 
-        let conn = establish_connection();
+        let mut conn = establish_connection();
 
         let result = frames
             .filter(deleted.eq(false))
             .filter(end.is_null())
             .order_by(start.desc())
-            .first::<Frame>(&conn)
+            .first::<Frame>(&mut conn)
             .optional()
             .expect("Error loading frames");
 
         if result.is_none() {
-            println!("No project started.");
-        } else {
-            let frame = result.unwrap();
-            let _result = diesel::update(&frame)
-                .set(end.eq(started_at))
-                .execute(&conn);
-
-            println!(
-                "Stopping project {}, started {} and stopped {}",
-                frame.project,
-                ago(frame.start),
-                ago(started_at.to_owned())
-            );
+            writeln!(output.out, "No project started.")?;
+            return Ok(());
         }
+        let frame = result.unwrap();
+        let _result = diesel::update(&frame)
+            .set(end.eq(started_at))
+            .execute(&mut conn);
+
+        writeln!(
+            output.out,
+            "Stopping project {}, started {} and stopped {}",
+            frame.project,
+            ago(frame.start),
+            ago(started_at.to_owned())
+        )?;
         return Ok(());
     }
 }

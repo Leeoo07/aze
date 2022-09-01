@@ -1,3 +1,5 @@
+use std::{env, path::MAIN_SEPARATOR};
+
 use anyhow::Result;
 use confy::ConfyError;
 use directories_next::ProjectDirs;
@@ -7,6 +9,14 @@ use serde::{Deserialize, Serialize};
 pub struct AppConfig {
     pub data_dir: String,
     pub datetime_format: String,
+}
+
+impl AppConfig {
+    pub fn database_url(&self) -> String {
+        let default = format!("{}{}{}", self.data_dir, MAIN_SEPARATOR, "frames.db");
+
+        env::var("DATABASE_URL").unwrap_or(default)
+    }
 }
 
 impl Default for AppConfig {

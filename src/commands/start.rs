@@ -6,7 +6,6 @@ use mycroft::cli::convert_tags;
 use mycroft::cli::parse_to_datetime;
 use mycroft::cli::process_project;
 use mycroft::cli::process_tags;
-use mycroft::database::establish_connection;
 use mycroft::service::frame::frame_start_collides;
 use mycroft::service::frame::last_finished_frame;
 use mycroft::service::frame::last_started_frame;
@@ -67,10 +66,9 @@ pub struct StartSubcommand {
 }
 
 impl MyCommand for StartSubcommand {
-    fn run(&self) -> Result<()> {
+    fn run(&self, output: super::Output) -> Result<()> {
         let project_string = self.project.to_string();
         let at = self.at;
-        let conn = establish_connection();
 
         let now = Local::now().naive_local();
         let started_at: NaiveDateTime;
@@ -78,7 +76,7 @@ impl MyCommand for StartSubcommand {
             started_at = at.unwrap();
             // TODO: check if at is in the future
         } else if self.no_gap {
-            let last_finished = last_finished_frame(&conn);
+            let last_finished = last_finished_frame();
             if last_finished.is_none() {
                 return Err(anyhow!("No finished frame found, 'no-gap' is not possible"));
             }
@@ -91,7 +89,7 @@ impl MyCommand for StartSubcommand {
             return Err(anyhow!("Start collides with existing frame"));
         }
 
-        let result = last_started_frame(&conn);
+        let result = last_started_frame();
         if result.is_some() {
             return Err(anyhow!(format!(
                 "Project {} is already started",
@@ -106,7 +104,8 @@ impl MyCommand for StartSubcommand {
             return Err(anyhow!("Aborted!"));
         }
 
-        println!(
+        writeln!(
+            output.out,
             "starting project {}{} at {}",
             project_string.purple(),
             if self.tags.len() > 0 {
@@ -115,9 +114,9 @@ impl MyCommand for StartSubcommand {
                 "".to_string()
             },
             started_at.format("%d.%m.%Y %H:%M").to_string().cyan(),
-        );
+        )?;
 
-        start_frame(&conn, &started_at, &project_string, self.tags.to_owned());
+        start_frame(&started_at, &project_string, self.tags.to_owned());
         return Ok(());
     }
 }

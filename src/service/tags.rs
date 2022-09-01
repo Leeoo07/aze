@@ -7,13 +7,13 @@ pub fn has_tag(tag: String) -> bool {
 
     #[derive(QueryableByName)]
     struct Tag {
-        #[sql_type = "VarChar"]
+        #[diesel(sql_type = VarChar)]
         name: String,
     }
 
-    let conn = establish_connection();
+    let mut conn = establish_connection();
     let results = diesel::sql_query(r#"SELECT DISTINCT tags AS name FROM frames"#)
-        .load::<Tag>(&conn)
+        .load::<Tag>(&mut conn)
         .expect("Query failed");
 
     for result in results {

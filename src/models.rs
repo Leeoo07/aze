@@ -15,7 +15,7 @@ pub struct Frame {
 }
 
 #[derive(Insertable)]
-#[table_name = "frames"]
+#[diesel(table_name = frames)]
 pub struct NewFrame<'a> {
     pub id: &'a str,
     pub start: &'a NaiveDateTime,

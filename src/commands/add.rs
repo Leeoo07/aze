@@ -6,7 +6,6 @@ use mycroft::cli::convert_tags;
 use mycroft::cli::parse_to_datetime;
 use mycroft::cli::process_project;
 use mycroft::cli::process_tags;
-use mycroft::database::establish_connection;
 use mycroft::service::frame::create_frame;
 use mycroft::service::frame::frame_collides;
 
@@ -48,7 +47,7 @@ pub struct AddSubcommand {
 }
 
 impl MyCommand for AddSubcommand {
-    fn run(&self) -> Result<()> {
+    fn run(&self, output: super::Output) -> Result<()> {
         process_project(self.project.to_string(), self.confirm_project);
         process_tags(self.tags.to_owned(), self.confirm_tags);
 
@@ -58,7 +57,8 @@ impl MyCommand for AddSubcommand {
             ));
         }
 
-        println!(
+        writeln!(
+            output.out,
             "starting project {}{} from {} to {}",
             self.project.purple(),
             if self.tags.len() > 0 {
@@ -74,16 +74,9 @@ impl MyCommand for AddSubcommand {
                 .format(&self.config().datetime_format)
                 .to_string()
                 .green()
-        );
+        )?;
 
-        let conn = establish_connection();
-        create_frame(
-            &conn,
-            &self.from,
-            &self.to,
-            &self.project,
-            self.tags.to_owned(),
-        );
+        create_frame(&self.from, &self.to, &self.project, self.tags.to_owned());
 
         return Ok(());
     }

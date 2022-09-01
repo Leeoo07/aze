@@ -17,17 +17,17 @@ use super::MyCommand;
 pub struct LogSubcommand {}
 
 impl MyCommand for LogSubcommand {
-    fn run(&self) -> Result<()> {
+    fn run(&self, output: super::Output) -> Result<()> {
         use mycroft::schema::frames::dsl::*;
 
-        let conn = establish_connection();
+        let mut conn = establish_connection();
 
         let last_week = (Local::now() - Duration::weeks(1)).naive_utc();
         let results = frames
             .filter(deleted.eq(false))
             .filter(start.gt(last_week))
             .order_by(start.desc())
-            .load::<Frame>(&conn)
+            .load::<Frame>(&mut conn)
             .expect("Error loading frames");
 
         let mut actual_day: Option<NaiveDate> = None;
@@ -46,7 +46,8 @@ impl MyCommand for LogSubcommand {
         for mut display in list {
             let duration = display.total_duration();
 
-            println!(
+            writeln!(
+                output.out,
                 "{} {} {} {} ({}h {}m {}s)",
                 display.date.weekday(),
                 display.date.day(),
@@ -55,13 +56,14 @@ impl MyCommand for LogSubcommand {
                 duration.num_hours(),
                 duration.num_minutes() - (duration.num_hours() * 60),
                 duration.num_seconds() - (duration.num_minutes() * 60)
-            );
+            )?;
             for frame in display.frames {
                 if frame.end.is_none() {
                     continue;
                 }
                 let frame_duration = frame.end.unwrap() - frame.start;
-                println!(
+                writeln!(
+                    output.out,
                     "\t{}\t{} to {}\t{}h {}m {}s\t{}",
                     &frame.id[..7],
                     frame.start.format("%H:%M"),
@@ -70,7 +72,7 @@ impl MyCommand for LogSubcommand {
                     frame_duration.num_minutes() - (frame_duration.num_hours() * 60),
                     frame_duration.num_seconds() - (frame_duration.num_minutes() * 60),
                     frame.project
-                );
+                )?;
             }
         }
 

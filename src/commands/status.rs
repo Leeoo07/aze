@@ -3,7 +3,6 @@ use crate::config::load_config;
 use anyhow::Result;
 use colored::Colorize;
 use mycroft::ago;
-use mycroft::database::establish_connection;
 use mycroft::service::frame::last_started_frame;
 
 #[derive(clap::Args, Debug)]
@@ -35,31 +34,31 @@ pub struct StatusSubcommand {
 }
 
 impl MyCommand for StatusSubcommand {
-    fn run(&self) -> Result<()> {
-        let conn = establish_connection();
-        let result = last_started_frame(&conn);
+    fn run(&self, output: super::Output) -> Result<()> {
+        let result = last_started_frame();
 
         if result.is_none() {
-            println!("No project started.");
+            writeln!(output.out, "No project started.")?;
             return Ok(());
         }
 
         let frame = result.unwrap();
 
         if self.show_project {
-            println!("{}", frame.project.purple());
+            writeln!(output.out, "{}", frame.project.purple())?;
             return Ok(());
         }
         if self.show_tags {
-            println!("{}", frame.tags.values().join(", ").cyan());
+            writeln!(output.out, "{}", frame.tags.values().join(", ").cyan())?;
             return Ok(());
         }
         if self.show_elapsed {
-            println!("{}", ago(frame.start).green());
+            writeln!(output.out, "{}", ago(frame.start).green())?;
             return Ok(());
         }
 
-        println!(
+        writeln!(
+            output.out,
             "Project {}{} started {} ({})",
             frame.project.purple(),
             if frame.tags.values().len() > 0 {
@@ -73,7 +72,7 @@ impl MyCommand for StatusSubcommand {
                 .format(&load_config().datetime_format)
                 .to_string()
                 .cyan()
-        );
+        )?;
 
         return Ok(());
     }

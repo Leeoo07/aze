@@ -2,13 +2,14 @@ extern crate diesel;
 
 use clap::Parser;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use commands::add::AddSubcommand;
 use commands::log::LogSubcommand;
 use commands::start::StartSubcommand;
 use commands::status::StatusSubcommand;
 use commands::stop::StopSubcommand;
-use commands::MyCommand;
+use commands::{MyCommand, Output};
+use mycroft::database::{establish_connection, run_migrations};
 pub mod commands;
 mod config;
 
@@ -59,21 +60,27 @@ enum Commands {
 }
 
 fn main() -> Result<()> {
+    let mut conn = establish_connection();
+
+    let migrations = run_migrations(&mut conn);
+    if migrations.is_err() {
+        return Err(anyhow!("Could not update internal database"));
+    }
+
     let args = Cli::parse();
     if args.version_flag {
         println!("{}", env!("CARGO_PKG_VERSION"));
         return Ok(());
     }
 
-    return match args.command {
-        Commands::Add(command) => run(&command),
-        Commands::Start(command) => run(&command),
-        Commands::Stop(command) => run(&command),
-        Commands::Status(command) => run(&command),
-        Commands::Log(command) => run(&command),
+    let output: Output = Output {
+        out: &mut std::io::stdout(),
     };
-}
-
-fn run(my_command: &dyn MyCommand) -> Result<()> {
-    return my_command.run();
+    return match args.command {
+        Commands::Add(command) => command.run(output),
+        Commands::Start(command) => command.run(output),
+        Commands::Stop(command) => command.run(output),
+        Commands::Status(command) => command.run(output),
+        Commands::Log(command) => command.run(output),
+    };
 }
