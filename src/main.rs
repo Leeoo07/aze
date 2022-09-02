@@ -61,7 +61,6 @@ enum Commands {
 
 fn main() -> Result<()> {
     let mut conn = establish_connection();
-
     let migrations = run_migrations(&mut conn);
     if migrations.is_err() {
         return Err(anyhow!("Could not update internal database"));

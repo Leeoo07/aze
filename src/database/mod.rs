@@ -3,20 +3,27 @@ use std::error::Error;
 use crate::config::load_config;
 use diesel::backend::{Backend, RawValue};
 use diesel::deserialize::FromSql;
+use diesel::r2d2;
+use diesel::r2d2::{ConnectionManager, Pool, PooledConnection};
 use diesel::serialize::{IsNull, Output, ToSql};
 use diesel::sql_types::Text;
 use diesel::sqlite::Sqlite;
+use diesel::SqliteConnection;
 use diesel::{deserialize, serialize};
-use diesel::{Connection, SqliteConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 
-pub fn establish_connection() -> SqliteConnection {
+pub fn get_connection_pool() -> Pool<ConnectionManager<SqliteConnection>> {
     let cfg = load_config();
+    let url = cfg.database_url();
 
-    let connection = SqliteConnection::establish(&cfg.database_url())
-        .expect(&format!("Error connecting to {}", &cfg.database_url()));
+    let manager = ConnectionManager::<SqliteConnection>::new(url);
+    return r2d2::Pool::new(manager).unwrap();
+}
 
-    return connection;
+pub fn establish_connection() -> PooledConnection<ConnectionManager<SqliteConnection>> {
+    let pool = get_connection_pool();
+
+    return pool.get().unwrap();
 }
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");

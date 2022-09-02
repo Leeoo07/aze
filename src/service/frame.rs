@@ -13,6 +13,7 @@ pub fn frame_start_collides(start_b: &NaiveDateTime) -> bool {
     use crate::schema::frames::dsl::*;
 
     let mut conn = establish_connection();
+
     let results = frames
         .filter(deleted.eq(false))
         .filter(end.gt(start_b))

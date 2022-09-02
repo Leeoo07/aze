@@ -13,7 +13,7 @@ chrono = {version = "0.4", features = [ "serde" ]}
 uuid = { version = "1.1.2", features = ["serde", "v4"] }
 thiserror = "1.0.32"
 anyhow = "1.0.61"
-diesel = { version = "2.0.0", features = ["sqlite", "chrono", "uuid"] }
+diesel = { version = "2.0.0", features = ["sqlite", "chrono", "uuid", "r2d2"] }
 dialoguer = "0.10.2"
 serde_json = "1.0.85"
 colored = "2.0.0"
@@ -23,4 +23,5 @@ diesel_migrations = { version = "2.0.0", features = ["sqlite"]}
 [dev-dependencies]
 assert_cmd = "2.0"
 predicates = "2.1"
+rand = "0.8.5"
 tempfile = "3.3.0"
