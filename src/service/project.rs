@@ -22,5 +22,5 @@ pub fn has_project(project: String) -> bool {
         }
     }
 
-    return false;
+    false
 }

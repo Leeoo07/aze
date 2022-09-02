@@ -18,6 +18,6 @@ pub trait MyCommand {
     fn run(&self, output: Output) -> Result<()>;
 
     fn config(&self) -> AppConfig {
-        return load_config();
+        load_config()
     }
 }

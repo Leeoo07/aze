@@ -34,7 +34,7 @@ impl MyCommand for LogSubcommand {
         let mut list: Vec<Display> = Vec::new();
 
         for frame in results {
-            let cloned_start = frame.start.date().clone();
+            let cloned_start = frame.start.date();
             if actual_day.is_none() || actual_day.unwrap() != frame.start.date() {
                 list.push(Display::new(cloned_start, vec![frame]));
                 actual_day = Some(cloned_start);
@@ -76,6 +76,6 @@ impl MyCommand for LogSubcommand {
             }
         }
 
-        return Ok(());
+        Ok(())
     }
 }

@@ -108,7 +108,7 @@ impl MyCommand for StartSubcommand {
             output.out,
             "starting project {}{} at {}",
             project_string.purple(),
-            if self.tags.len() > 0 {
+            if !self.tags.is_empty() {
                 format!(" [{}]", self.tags.join(", ").blue())
             } else {
                 "".to_string()
@@ -117,6 +117,6 @@ impl MyCommand for StartSubcommand {
         )?;
 
         start_frame(&started_at, &project_string, self.tags.to_owned());
-        return Ok(());
+        Ok(())
     }
 }

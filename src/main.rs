@@ -75,11 +75,11 @@ fn main() -> Result<()> {
     let output: Output = Output {
         out: &mut std::io::stdout(),
     };
-    return match args.command {
+    match args.command {
         Commands::Add(command) => command.run(output),
         Commands::Start(command) => command.run(output),
         Commands::Stop(command) => command.run(output),
         Commands::Status(command) => command.run(output),
         Commands::Log(command) => command.run(output),
-    };
+    }
 }

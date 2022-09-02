@@ -21,7 +21,7 @@ pub fn frame_start_collides(start_b: &NaiveDateTime) -> bool {
         .load::<Frame>(&mut conn)
         .expect("Error loading frames");
 
-    return !results.is_empty();
+    !results.is_empty()
 }
 
 pub fn frame_collides(start_b: &NaiveDateTime, end_b: &NaiveDateTime) -> bool {
@@ -36,14 +36,14 @@ pub fn frame_collides(start_b: &NaiveDateTime, end_b: &NaiveDateTime) -> bool {
         .load::<Frame>(&mut conn)
         .expect("Error loading frames");
 
-    return !results.is_empty();
+    !results.is_empty()
 }
 
 pub fn create_frame(start: &NaiveDateTime, end: &NaiveDateTime, project: &str, tags: Vec<String>) {
     use serde_json::json;
 
     let uuid: Uuid = Uuid::new_v4();
-    let end_value: Option<&NaiveDateTime> = Option::Some(&end);
+    let end_value: Option<&NaiveDateTime> = Option::Some(end);
 
     let tags: MyJsonType = MyJsonType(json!(tags));
 
@@ -95,13 +95,13 @@ pub fn last_started_frame() -> Option<Frame> {
     use crate::schema::frames::dsl::*;
     let mut conn = establish_connection();
 
-    return frames
+    frames
         .filter(deleted.eq(false))
         .filter(end.is_null())
         .order_by(start.desc())
         .load::<Frame>(&mut conn)
         .expect("Error loading frames")
-        .pop();
+        .pop()
 }
 
 pub fn last_finished_frame() -> Option<Frame> {
@@ -116,5 +116,5 @@ pub fn last_finished_frame() -> Option<Frame> {
         .load::<Frame>(&mut conn)
         .expect("Error loading frames");
 
-    return VecDeque::from_iter(results).pop_front();
+    VecDeque::from_iter(results).pop_front()
 }

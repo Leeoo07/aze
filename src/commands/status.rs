@@ -61,7 +61,7 @@ impl MyCommand for StatusSubcommand {
             output.out,
             "Project {}{} started {} ({})",
             frame.project.purple(),
-            if frame.tags.values().len() > 0 {
+            if !frame.tags.values().is_empty() {
                 format!(" [{}]", frame.tags.values().join(", ").blue())
             } else {
                 "".to_string()
@@ -74,6 +74,6 @@ impl MyCommand for StatusSubcommand {
                 .cyan()
         )?;
 
-        return Ok(());
+        Ok(())
     }
 }

@@ -26,5 +26,5 @@ pub fn has_tag(tag: String) -> bool {
         }
     }
 
-    return false;
+    false
 }

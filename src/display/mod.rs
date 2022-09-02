@@ -28,7 +28,7 @@ impl Display {
             }
         }
 
-        return duration;
+        duration
     }
 }
 

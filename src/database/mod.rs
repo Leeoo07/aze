@@ -17,13 +17,13 @@ pub fn get_connection_pool() -> Pool<ConnectionManager<SqliteConnection>> {
     let url = cfg.database_url();
 
     let manager = ConnectionManager::<SqliteConnection>::new(url);
-    return r2d2::Pool::new(manager).unwrap();
+    r2d2::Pool::new(manager).unwrap()
 }
 
 pub fn establish_connection() -> PooledConnection<ConnectionManager<SqliteConnection>> {
     let pool = get_connection_pool();
 
-    return pool.get().unwrap();
+    pool.get().unwrap()
 }
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
@@ -56,7 +56,7 @@ impl MyJsonType {
 
             vec.push(item.as_str().unwrap().trim_matches('"').to_string());
         }
-        return vec;
+        vec
     }
 }
 

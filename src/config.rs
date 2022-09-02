@@ -35,7 +35,7 @@ impl Default for AppConfig {
 pub fn load_config() -> AppConfig {
     let cfg: Result<AppConfig, ConfyError> = confy::load("mycroft");
 
-    return cfg.unwrap_or(AppConfig::default());
+    cfg.unwrap_or_default()
 }
 
 #[cfg(test)]

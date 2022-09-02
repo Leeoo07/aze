@@ -8,13 +8,13 @@ use crate::service::project::has_project;
 use crate::service::tags::has_tag;
 
 pub fn parse_to_datetime(s: &str) -> Result<NaiveDateTime, ParseError> {
-    return NaiveDateTime::parse_from_str(s, &load_config().datetime_format);
+    NaiveDateTime::parse_from_str(s, &load_config().datetime_format)
 }
 pub fn convert_tags(v: &str) -> Result<String, String> {
-    if !v.starts_with("+") {
+    if !v.starts_with('+') {
         return Err("Fail".to_string());
     }
-    return Ok(v.strip_prefix("+").unwrap().to_string());
+    return Ok(v.strip_prefix('+').unwrap().to_string());
 }
 
 pub fn process_tags(tags: Vec<String>, confirm: bool) -> bool {
@@ -23,36 +23,30 @@ pub fn process_tags(tags: Vec<String>, confirm: bool) -> bool {
             return false;
         }
     }
-    return true;
+    true
 }
 
 pub fn process_tag(tag: String, confirm: bool) -> bool {
-    if confirm && !has_tag(tag.to_string()) {
-        if !Confirm::with_theme(&ColorfulTheme::default())
+    if confirm && !has_tag(tag.to_string()) && !Confirm::with_theme(&ColorfulTheme::default())
             .with_prompt(format!("Tag '{}' does not exist yet. Create it?", tag))
             .default(false)
             .interact()
-            .unwrap()
-        {
-            return false;
-        }
+            .unwrap() {
+        return false;
     }
-    return true;
+    true
 }
 
 pub fn process_project(project: String, confirm: bool) -> bool {
-    if confirm && !has_project(project.to_string()) {
-        if !Confirm::with_theme(&ColorfulTheme::default())
+    if confirm && !has_project(project.to_string()) && !Confirm::with_theme(&ColorfulTheme::default())
             .with_prompt(format!(
                 "Project '{}' does not exist yet. Create it?",
                 project
             ))
             .default(false)
             .interact()
-            .unwrap()
-        {
-            return false;
-        }
+            .unwrap() {
+        return false;
     }
-    return true;
+    true
 }

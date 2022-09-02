@@ -55,6 +55,6 @@ impl MyCommand for StopSubcommand {
             ago(frame.start),
             ago(started_at.to_owned())
         )?;
-        return Ok(());
+        Ok(())
     }
 }

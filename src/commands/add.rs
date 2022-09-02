@@ -61,7 +61,7 @@ impl MyCommand for AddSubcommand {
             output.out,
             "starting project {}{} from {} to {}",
             self.project.purple(),
-            if self.tags.len() > 0 {
+            if !self.tags.is_empty() {
                 format!(" [{}]", self.tags.join(",").cyan())
             } else {
                 "".to_string()
@@ -78,6 +78,6 @@ impl MyCommand for AddSubcommand {
 
         create_frame(&self.from, &self.to, &self.project, self.tags.to_owned());
 
-        return Ok(());
+        Ok(())
     }
 }
