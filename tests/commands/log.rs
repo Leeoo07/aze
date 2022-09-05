@@ -5,7 +5,9 @@ use predicates::prelude::*;
 use std::process::Command;
 use tempfile::tempdir;
 
-use super::{add_frame, add_frame_with_tags};
+use crate::TestDb;
+
+use super::add_frame;
 
 #[test]
 fn nothing_if_no_entries() -> Result<(), Box<dyn std::error::Error>> {
@@ -22,8 +24,8 @@ fn nothing_if_no_entries() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn entry_from_this_day() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
 
     let start = Local::now().naive_local().timestamp() - 3600;
     let end = start + 1800;
@@ -31,7 +33,7 @@ fn entry_from_this_day() -> Result<(), Box<dyn std::error::Error>> {
     let dt_start = NaiveDateTime::from_timestamp(start, 0);
     let dt_end = NaiveDateTime::from_timestamp(end, 0);
 
-    add_frame(&database.to_str().unwrap(), &"test", &dt_start, &dt_end)?;
+    add_frame(&test_db, &"test", &dt_start, Some(&dt_end), None)?;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
     cmd.arg("log").env("DATABASE_URL", &database);
@@ -45,8 +47,8 @@ fn entry_from_this_day() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn entry_from_last_two_weeks_default_not_shown() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
 
     let start = Local::now().naive_local().timestamp() - 3600 * 24 * 10;
     let end = start + 1800;
@@ -54,7 +56,7 @@ fn entry_from_last_two_weeks_default_not_shown() -> Result<(), Box<dyn std::erro
     let dt_start = NaiveDateTime::from_timestamp(start, 0);
     let dt_end = NaiveDateTime::from_timestamp(end, 0);
 
-    add_frame(&database.to_str().unwrap(), &"test", &dt_start, &dt_end)?;
+    add_frame(&test_db, &"test", &dt_start, Some(&dt_end), None)?;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
     cmd.arg("log").env("DATABASE_URL", &database);
@@ -66,23 +68,24 @@ fn entry_from_last_two_weeks_default_not_shown() -> Result<(), Box<dyn std::erro
 
 #[test]
 fn duration_correctly_calculated() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let start = Local::now().naive_local().timestamp() - 7200;
     let end = start + 1800;
 
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test",
         &NaiveDateTime::from_timestamp(start, 0),
-        &NaiveDateTime::from_timestamp(end, 0),
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        None,
     )?;
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test",
         &NaiveDateTime::from_timestamp(start + 3600, 0),
-        &NaiveDateTime::from_timestamp(end + 3600, 0),
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        None,
     )?;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
@@ -98,23 +101,24 @@ fn duration_correctly_calculated() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn get_only_correct_project_entries() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let start = Local::now().naive_local().timestamp() - 7200;
     let end = start + 1800;
 
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test1",
         &NaiveDateTime::from_timestamp(start, 0),
-        &NaiveDateTime::from_timestamp(end, 0),
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        None,
     )?;
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test2",
         &NaiveDateTime::from_timestamp(start + 3600, 0),
-        &NaiveDateTime::from_timestamp(end + 3600, 0),
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        None,
     )?;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
@@ -133,23 +137,24 @@ fn get_only_correct_project_entries() -> Result<(), Box<dyn std::error::Error>> 
 
 #[test]
 fn get_only_correct_projects_entries() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let start = Local::now().naive_local().timestamp() - 7200;
     let end = start + 1800;
 
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test1",
         &NaiveDateTime::from_timestamp(start, 0),
-        &NaiveDateTime::from_timestamp(end, 0),
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        None,
     )?;
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test2",
         &NaiveDateTime::from_timestamp(start + 3600, 0),
-        &NaiveDateTime::from_timestamp(end + 3600, 0),
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        None,
     )?;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
@@ -170,23 +175,24 @@ fn get_only_correct_projects_entries() -> Result<(), Box<dyn std::error::Error>>
 
 #[test]
 fn ignore_single_project() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let start = Local::now().naive_local().timestamp() - 7200;
     let end = start + 1800;
 
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test1",
         &NaiveDateTime::from_timestamp(start, 0),
-        &NaiveDateTime::from_timestamp(end, 0),
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        None,
     )?;
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test2",
         &NaiveDateTime::from_timestamp(start + 3600, 0),
-        &NaiveDateTime::from_timestamp(end + 3600, 0),
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        None,
     )?;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
@@ -205,23 +211,24 @@ fn ignore_single_project() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn ignore_multiple_projects() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let start = Local::now().naive_local().timestamp() - 7200;
     let end = start + 1800;
 
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test1",
         &NaiveDateTime::from_timestamp(start, 0),
-        &NaiveDateTime::from_timestamp(end, 0),
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        None,
     )?;
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test2",
         &NaiveDateTime::from_timestamp(start + 3600, 0),
-        &NaiveDateTime::from_timestamp(end + 3600, 0),
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        None,
     )?;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
@@ -242,9 +249,8 @@ fn ignore_multiple_projects() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn ignore_and_select_projects() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let mut cmd = Command::cargo_bin("mycroft")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
@@ -262,25 +268,24 @@ fn ignore_and_select_projects() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn get_only_correct_tag_entries() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let start = Local::now().naive_local().timestamp() - 7200;
     let end = start + 1800;
 
-    add_frame_with_tags(
-        &database.to_str().unwrap(),
+    add_frame(
+        &test_db,
         &"test1",
         &NaiveDateTime::from_timestamp(start, 0),
-        &NaiveDateTime::from_timestamp(end, 0),
-        vec!["test1".to_string()],
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        Some(vec!["test1".to_string()]),
     )?;
-    add_frame_with_tags(
-        &database.to_str().unwrap(),
+    add_frame(
+        &test_db,
         &"test2",
         &NaiveDateTime::from_timestamp(start + 3600, 0),
-        &NaiveDateTime::from_timestamp(end + 3600, 0),
-        vec!["test2".to_string()],
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        Some(vec!["test2".to_string()]),
     )?;
     let mut cmd = Command::cargo_bin("mycroft")?;
     cmd.env("DATABASE_URL", &database)
@@ -298,25 +303,24 @@ fn get_only_correct_tag_entries() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn get_only_correct_tags_entries() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let start = Local::now().naive_local().timestamp() - 7200;
     let end = start + 1800;
 
-    add_frame_with_tags(
-        &database.to_str().unwrap(),
+    add_frame(
+        &test_db,
         &"test1",
         &NaiveDateTime::from_timestamp(start, 0),
-        &NaiveDateTime::from_timestamp(end, 0),
-        vec!["test1".to_string()],
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        Some(vec!["test1".to_string()]),
     )?;
-    add_frame_with_tags(
-        &database.to_str().unwrap(),
+    add_frame(
+        &test_db,
         &"test2",
         &NaiveDateTime::from_timestamp(start + 3600, 0),
-        &NaiveDateTime::from_timestamp(end + 3600, 0),
-        vec!["test2".to_string()],
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        Some(vec!["test2".to_string()]),
     )?;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
@@ -337,24 +341,24 @@ fn get_only_correct_tags_entries() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn ignore_single_tag() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let start = Local::now().naive_local().timestamp() - 7200;
     let end = start + 1800;
 
     add_frame(
-        &database.to_str().unwrap(),
+        &test_db,
         &"test1",
         &NaiveDateTime::from_timestamp(start, 0),
-        &NaiveDateTime::from_timestamp(end, 0),
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        None,
     )?;
-    add_frame_with_tags(
-        &database.to_str().unwrap(),
+    add_frame(
+        &test_db,
         &"test2",
         &NaiveDateTime::from_timestamp(start + 3600, 0),
-        &NaiveDateTime::from_timestamp(end + 3600, 0),
-        vec!["test2".to_string()],
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        Some(vec!["test2".to_string()]),
     )?;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
@@ -373,25 +377,24 @@ fn ignore_single_tag() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn ignore_multiple_tags() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let start = Local::now().naive_local().timestamp() - 7200;
     let end = start + 1800;
 
-    add_frame_with_tags(
-        &database.to_str().unwrap(),
+    add_frame(
+        &test_db,
         &"test1",
         &NaiveDateTime::from_timestamp(start, 0),
-        &NaiveDateTime::from_timestamp(end, 0),
-        vec!["test1".to_string()],
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        Some(vec!["test1".to_string()]),
     )?;
-    add_frame_with_tags(
-        &database.to_str().unwrap(),
+    add_frame(
+        &test_db,
         &"test2",
         &NaiveDateTime::from_timestamp(start + 3600, 0),
-        &NaiveDateTime::from_timestamp(end + 3600, 0),
-        vec!["test2".to_string()],
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        Some(vec!["test2".to_string()]),
     )?;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
@@ -412,9 +415,8 @@ fn ignore_multiple_tags() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn ignore_and_select_tags() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let mut cmd = Command::cargo_bin("mycroft")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
@@ -432,25 +434,24 @@ fn ignore_and_select_tags() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn get_entries_from_multiple_tags() -> Result<(), Box<dyn std::error::Error>> {
-    let dir = tempdir()?;
-    let database = dir.path().join("database.db");
-
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
     let start = Local::now().naive_local().timestamp() - 7200;
     let end = start + 1800;
 
-    add_frame_with_tags(
-        &database.to_str().unwrap(),
+    add_frame(
+        &test_db,
         &"test1",
         &NaiveDateTime::from_timestamp(start, 0),
-        &NaiveDateTime::from_timestamp(end, 0),
-        vec!["test1".to_string(), "test3".to_string()],
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        Some(vec!["test1".to_string(), "test3".to_string()]),
     )?;
-    add_frame_with_tags(
-        &database.to_str().unwrap(),
+    add_frame(
+        &test_db,
         &"test2",
         &NaiveDateTime::from_timestamp(start + 3600, 0),
-        &NaiveDateTime::from_timestamp(end + 3600, 0),
-        vec!["test2".to_string(), "test3".to_string()],
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        Some(vec!["test2".to_string(), "test3".to_string()]),
     )?;
     let mut cmd = Command::cargo_bin("mycroft")?;
     cmd.env("DATABASE_URL", &database)
@@ -462,6 +463,52 @@ fn get_entries_from_multiple_tags() -> Result<(), Box<dyn std::error::Error>> {
         .success()
         .stdout(predicate::str::contains("test1"))
         .stdout(predicate::str::contains("test2"));
+
+    Ok(())
+}
+
+#[test]
+fn entries_does_not_cover_current_frame() -> Result<(), Box<dyn std::error::Error>> {
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
+    let start = Local::now().naive_local().timestamp() - 7200;
+
+    add_frame(
+        &test_db,
+        &"test1",
+        &NaiveDateTime::from_timestamp(start, 0),
+        None,
+        None,
+    )?;
+
+    let mut cmd = Command::cargo_bin("mycroft")?;
+    cmd.env("DATABASE_URL", &database).arg("log");
+
+    cmd.assert().success().stdout(predicate::str::is_empty());
+
+    Ok(())
+}
+
+#[test]
+fn entries_cover_current_frame_if_requested() -> Result<(), Box<dyn std::error::Error>> {
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
+    let start = Local::now().naive_local().timestamp() - 7200;
+
+    add_frame(
+        &test_db,
+        &"test1",
+        &NaiveDateTime::from_timestamp(start, 0),
+        None,
+        None,
+    )?;
+
+    let mut cmd = Command::cargo_bin("mycroft")?;
+    cmd.env("DATABASE_URL", &database).arg("log").arg("-c");
+
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("test1"));
 
     Ok(())
 }

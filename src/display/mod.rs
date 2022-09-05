@@ -1,6 +1,6 @@
 use std::ops::Add;
 
-use chrono::{Duration, NaiveDate};
+use chrono::{Duration, Local, NaiveDate};
 
 use crate::models::Frame;
 
@@ -25,6 +25,9 @@ impl Display {
         for frame in frames {
             if frame.end.is_some() {
                 duration = duration.add(frame.end.unwrap() - frame.start);
+            } else {
+                let now = Local::now().naive_local();
+                duration = duration.add(now - frame.start)
             }
         }
 

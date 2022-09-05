@@ -1,42 +1,49 @@
-use assert_cmd::prelude::*;
-
+use crate::TestDb;
 use chrono::NaiveDateTime;
-use std::process::Command;
+use diesel::RunQueryDsl;
+use mycroft::{
+    database::MyJsonType,
+    models::{Frame, NewFrame},
+    schema::frames,
+};
+use uuid::Uuid;
 
 mod add;
 mod log;
 
 pub fn add_frame(
-    database: &str,
+    test_db: &TestDb,
     project: &str,
     from: &NaiveDateTime,
-    to: &NaiveDateTime,
+    to: Option<&NaiveDateTime>,
+    tags: Option<Vec<String>>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    add_frame_with_tags(database, project, from, to, vec![])
-}
+    use serde_json::json;
 
-pub fn add_frame_with_tags(
-    database: &str,
-    project: &str,
-    from: &NaiveDateTime,
-    to: &NaiveDateTime,
-    tags: Vec<String>,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let uuid: Uuid = Uuid::new_v4();
+    let tags: MyJsonType = MyJsonType(json!(tags));
 
-    cmd.arg("add")
-        .env("DATABASE_URL", database)
-        .arg("--from")
-        .arg(from.format("%Y-%m-%d %H:%M").to_string())
-        .arg("--to")
-        .arg(to.format("%Y-%m-%d %H:%M").to_string())
-        .arg(project);
-
-    for tag in tags {
-        cmd.arg(format!("+{}", tag));
-    }
-
-    cmd.assert().success();
+    let new_frame = NewFrame {
+        id: &uuid.to_string(),
+        start: from,
+        end: to,
+        last_update: &NaiveDateTime::default(),
+        project,
+        tags: &tags,
+        deleted: &false,
+    };
+    let mut conn = test_db.conn().expect("error");
+    diesel::insert_into(frames::table)
+        .values(&new_frame)
+        .execute(&mut conn)
+        .expect("Error saving new frame");
 
     Ok(())
+}
+
+pub fn get_frames(test_db: &TestDb) -> Vec<Frame> {
+    let mut conn = test_db.conn().expect("error");
+    use mycroft::schema::frames::dsl::*;
+
+    frames.load::<Frame>(&mut conn).expect("error")
 }

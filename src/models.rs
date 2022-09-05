@@ -3,7 +3,7 @@ use crate::database::MyJsonType;
 use super::schema::frames;
 use chrono::NaiveDateTime;
 use diesel::{Insertable, Queryable};
-#[derive(Queryable, Clone, Identifiable)]
+#[derive(Queryable, Clone, Identifiable, Debug)]
 pub struct Frame {
     pub id: String,
     pub start: NaiveDateTime,

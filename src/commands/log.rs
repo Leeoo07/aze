@@ -212,6 +212,10 @@ impl MyCommand for LogSubcommand {
             query = query.filter(not(tags.like(format!("%{}%", tag))));
         }
 
+        if !self.current {
+            query = query.filter(not(end.is_null()));
+        }
+
         let results = query
             .load::<Frame>(&mut conn)
             .expect("Error loading frames");
@@ -250,16 +254,14 @@ impl MyCommand for LogSubcommand {
                 )
             )?;
             for frame in display.frames {
-                if frame.end.is_none() {
-                    continue;
-                }
-                let frame_duration = frame.end.unwrap() - frame.start;
+                let now = Local::now().naive_local();
+                let frame_duration = frame.end.unwrap_or(now) - frame.start;
                 writeln!(
                     output.out,
                     "\t{}\t{} to {}\t{}h {}m {}s\t{}",
                     &frame.id[..7],
                     frame.start.format("%H:%M"),
-                    frame.end.unwrap().format("%H:%M"),
+                    frame.end.unwrap_or(now).format("%H:%M"),
                     frame_duration.num_hours(),
                     format!(
                         "{:02}",
