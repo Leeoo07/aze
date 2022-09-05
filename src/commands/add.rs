@@ -25,7 +25,6 @@ pub struct AddSubcommand {
 
     #[clap(help = "Date and time of start of tracked activity", display_order = 1, short = 'f', long = "from", value_parser = parse_to_datetime, required = true)]
     pub from: NaiveDateTime,
-
     #[clap(help = "Date and time of end of tracked activity", display_order = 2, short = 't', long = "to", value_parser = parse_to_datetime, required = true)]
     pub to: NaiveDateTime,
 

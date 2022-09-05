@@ -139,3 +139,23 @@ fn start_and_end_in_overlapping_frame_returns_in_error() -> Result<(), Box<dyn s
 
     Ok(())
 }
+
+#[test]
+fn adding_tags_to_frames() -> Result<(), Box<dyn std::error::Error>> {
+    let mut cmd = Command::cargo_bin("mycroft")?;
+
+    cmd.arg("add")
+        .env("DATABASE_URL", "file::memory:?cache=shared")
+        .arg("--from")
+        .arg("2000-01-01 13:00")
+        .arg("--to")
+        .arg("2000-01-01 14:00")
+        .arg("test")
+        .arg("+tag1");
+
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("[tag1]"));
+
+    Ok(())
+}
