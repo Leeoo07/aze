@@ -1,9 +1,7 @@
 use assert_cmd::prelude::*;
 
-use chrono::{DateTime, Local, NaiveDate, NaiveDateTime, Timelike};
-use predicates::prelude::*;
+use chrono::NaiveDateTime;
 use std::process::Command;
-use tempfile::tempdir;
 
 mod add;
 mod log;

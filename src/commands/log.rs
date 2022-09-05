@@ -6,14 +6,12 @@ use chrono::Local;
 use chrono::NaiveDate;
 use chrono::NaiveDateTime;
 use diesel::associations::HasTable;
-use diesel::sql_types::Bool;
-use diesel::sql_types::SqlType;
-use diesel::BoxableExpression;
+use diesel::dsl::not;
+use diesel::TextExpressionMethods;
 use mycroft::cli::parse_to_datetime;
 use mycroft::database::establish_connection;
 use mycroft::display::Display;
 use mycroft::models::Frame;
-use mycroft::schema;
 
 use crate::diesel::ExpressionMethods;
 use crate::diesel::QueryDsl;
@@ -197,15 +195,21 @@ impl MyCommand for LogSubcommand {
             .filter(deleted.eq(false))
             .filter(start.gt(last_week))
             .filter(project.ne_all(self.ignored_projects.to_vec()))
-            .filter(tags.ne_all(self.ignored_tags.to_vec()))
             .order_by(start.desc());
 
         if !self.projects.is_empty() {
             query = query.filter(project.eq_any(self.projects.to_vec()));
         }
 
-        if !self.tags.is_empty() {
-            query = query.filter(tags.eq_any(self.tags.to_vec()));
+        if !&self.tags.is_empty() {
+            query = query.filter(not(tags.eq(tags)));
+            for tag in &self.tags {
+                query = query.or_filter(tags.like(format!("%{}%", tag)));
+            }
+        }
+
+        for tag in &self.ignored_tags {
+            query = query.filter(not(tags.like(format!("%{}%", tag))));
         }
 
         let results = query
