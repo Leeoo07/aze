@@ -226,10 +226,18 @@ impl MyCommand for LogSubcommand {
         for frame in results {
             let cloned_start = frame.start.date();
             if actual_day.is_none() || actual_day.unwrap() != frame.start.date() {
-                list.push(Display::new(cloned_start, vec![frame]));
+                if self.reverse {
+                    list.insert(0, Display::new(cloned_start, vec![frame]));
+                } else {
+                    list.push(Display::new(cloned_start, vec![frame]));
+                }
                 actual_day = Some(cloned_start);
             } else {
-                list.last_mut().unwrap().add_frame(frame);
+                if self.reverse {
+                    list.last_mut().unwrap().insert_frame(frame);
+                } else {
+                    list.last_mut().unwrap().add_frame(frame);
+                }
             }
         }
 
@@ -253,6 +261,7 @@ impl MyCommand for LogSubcommand {
                     duration.num_seconds() - (duration.num_minutes() * 60)
                 )
             )?;
+
             for frame in display.frames {
                 let now = Local::now().naive_local();
                 let frame_duration = frame.end.unwrap_or(now) - frame.start;

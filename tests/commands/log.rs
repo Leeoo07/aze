@@ -1,7 +1,7 @@
 use assert_cmd::prelude::*;
-
 use chrono::{Local, NaiveDateTime};
 use predicates::prelude::*;
+use regex::Regex;
 use std::process::Command;
 use tempfile::tempdir;
 
@@ -510,5 +510,78 @@ fn entries_cover_current_frame_if_requested() -> Result<(), Box<dyn std::error::
         .success()
         .stdout(predicate::str::contains("test1"));
 
+    Ok(())
+}
+
+#[test]
+fn order_newest_top() -> Result<(), Box<dyn std::error::Error>> {
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
+    let start = Local::now().naive_local().timestamp() - 7200;
+    let end = start + 1800;
+
+    add_frame(
+        &test_db,
+        &"test1",
+        &NaiveDateTime::from_timestamp(start, 0),
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        None,
+    )?;
+    add_frame(
+        &test_db,
+        &"test2",
+        &NaiveDateTime::from_timestamp(start + 3600, 0),
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        None,
+    )?;
+
+    let mut cmd = Command::cargo_bin("mycroft")?;
+    cmd.env("DATABASE_URL", &database).arg("log").arg("-c");
+
+    cmd.assert().success();
+    let stdout = String::from_utf8(cmd.output().expect("err").stdout)
+        .expect("err")
+        .replace("\n", "");
+
+    let re = Regex::new(r"^.*test2.*test1$").unwrap();
+    assert!(re.is_match(stdout.as_str()), "Output: {}", stdout);
+    Ok(())
+}
+
+#[test]
+fn order_oldest_top() -> Result<(), Box<dyn std::error::Error>> {
+    let test_db = TestDb::new();
+    let database = &test_db.db_path;
+    let start = Local::now().naive_local().timestamp() - 7200;
+    let end = start + 1800;
+
+    add_frame(
+        &test_db,
+        &"test1",
+        &NaiveDateTime::from_timestamp(start, 0),
+        Some(&NaiveDateTime::from_timestamp(end, 0)),
+        None,
+    )?;
+    add_frame(
+        &test_db,
+        &"test2",
+        &NaiveDateTime::from_timestamp(start + 3600, 0),
+        Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
+        None,
+    )?;
+
+    let mut cmd = Command::cargo_bin("mycroft")?;
+    cmd.env("DATABASE_URL", &database)
+        .arg("log")
+        .arg("-c")
+        .arg("-r");
+
+    cmd.assert().success();
+    let stdout = String::from_utf8(cmd.output().expect("err").stdout)
+        .expect("err")
+        .replace("\n", "");
+
+    let re = Regex::new(r"^.*test1.*test2$").unwrap();
+    assert!(re.is_match(stdout.as_str()), "Output: {}", stdout);
     Ok(())
 }

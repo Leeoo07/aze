@@ -492,6 +492,7 @@ dependencies = [
  "directories-next",
  "predicates",
  "rand",
+ "regex",
  "serde",
  "serde_json",
  "tempfile",

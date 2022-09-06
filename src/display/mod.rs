@@ -19,6 +19,10 @@ impl Display {
         self.frames.push(frame);
     }
 
+    pub fn insert_frame(&mut self, frame: Frame) {
+        self.frames.insert(0, frame);
+    }
+
     pub fn total_duration(&mut self) -> Duration {
         let mut duration = Duration::zero();
         let frames = self.frames.clone();
