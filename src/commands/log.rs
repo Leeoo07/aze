@@ -16,6 +16,7 @@ use mycroft::models::Frame;
 use crate::diesel::ExpressionMethods;
 use crate::diesel::QueryDsl;
 use crate::diesel::RunQueryDsl;
+use colored::Colorize;
 
 use super::MyCommand;
 
@@ -188,12 +189,20 @@ impl MyCommand for LogSubcommand {
         }
 
         let last_week = (Local::now() - Duration::weeks(1)).naive_utc();
+        let filter_from = self.from.unwrap_or(last_week);
+
+        let tomorrow = NaiveDate::succ(&Local::today().naive_local()).and_hms(0, 0, 0);
+        let filter_end = self.to.unwrap_or(tomorrow);
+
+        if filter_from > filter_end {
+            return Err(anyhow!("'from' must be anterior to 'to'"));
+        }
 
         let mut query = frames::table().into_boxed();
 
         query = query
             .filter(deleted.eq(false))
-            .filter(start.gt(last_week))
+            .filter(start.gt(filter_from))
             .filter(project.ne_all(self.ignored_projects.to_vec()))
             .order_by(start.desc());
 
@@ -212,8 +221,12 @@ impl MyCommand for LogSubcommand {
             query = query.filter(not(tags.like(format!("%{}%", tag))));
         }
 
-        if !self.current {
-            query = query.filter(not(end.is_null()));
+        if filter_end > Local::now().naive_local() {
+            if !self.current {
+                query = query.filter(not(end.is_null()));
+            }
+        } else {
+            query = query.filter(end.lt(filter_end));
         }
 
         let results = query
@@ -246,20 +259,28 @@ impl MyCommand for LogSubcommand {
 
             writeln!(
                 output.out,
-                "{} {} {} {} ({}h {}m {}s)",
-                display.date.weekday(),
-                display.date.day(),
-                display.date.month(),
-                display.date.year(),
-                duration.num_hours(),
+                "{} ({})",
                 format!(
-                    "{:02}",
-                    duration.num_minutes() - (duration.num_hours() * 60)
-                ),
-                format!(
-                    "{:02}",
-                    duration.num_seconds() - (duration.num_minutes() * 60)
+                    "{} {} {} {}",
+                    display.date.weekday(),
+                    display.date.day(),
+                    display.date.month(),
+                    display.date.year()
                 )
+                .cyan(),
+                format!(
+                    "{}h {}m {}s",
+                    duration.num_hours(),
+                    format!(
+                        "{:02}",
+                        duration.num_minutes() - (duration.num_hours() * 60)
+                    ),
+                    format!(
+                        "{:02}",
+                        duration.num_seconds() - (duration.num_minutes() * 60)
+                    )
+                )
+                .green()
             )?;
 
             for frame in display.frames {
@@ -268,9 +289,9 @@ impl MyCommand for LogSubcommand {
                 writeln!(
                     output.out,
                     "\t{}\t{} to {}\t{}h {}m {}s\t{}",
-                    &frame.id[..7],
-                    frame.start.format("%H:%M"),
-                    frame.end.unwrap_or(now).format("%H:%M"),
+                    &frame.id[..7].to_string().bright_black(),
+                    frame.start.format("%H:%M").to_string().green(),
+                    frame.end.unwrap_or(now).format("%H:%M").to_string().green(),
                     frame_duration.num_hours(),
                     format!(
                         "{:02}",
@@ -280,7 +301,7 @@ impl MyCommand for LogSubcommand {
                         "{:02}",
                         frame_duration.num_seconds() - (frame_duration.num_minutes() * 60)
                     ),
-                    frame.project
+                    frame.project.purple()
                 )?;
             }
         }
