@@ -10,6 +10,9 @@ use uuid::Uuid;
 
 mod add;
 mod log;
+mod start;
+mod status;
+mod stop;
 
 pub fn add_frame(
     test_db: &TestDb,

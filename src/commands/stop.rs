@@ -1,6 +1,7 @@
 use crate::diesel::ExpressionMethods;
 use crate::diesel::QueryDsl;
 use crate::diesel::RunQueryDsl;
+use anyhow::anyhow;
 use anyhow::Result;
 use chrono::{Local, NaiveDateTime};
 use diesel::OptionalExtension;
@@ -40,8 +41,7 @@ impl MyCommand for StopSubcommand {
             .expect("Error loading frames");
 
         if result.is_none() {
-            writeln!(output.out, "No project started.")?;
-            return Ok(());
+            return Err(anyhow!("No project started."));
         }
         let frame = result.unwrap();
         let _result = diesel::update(&frame)

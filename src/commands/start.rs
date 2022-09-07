@@ -45,22 +45,12 @@ pub struct StartSubcommand {
     pub confirm_tags: bool,
 
     #[clap(
-        name = "gap",
-        help = "Leave gap between end time of previous project and start time of the current.",
-        short = 'g',
-        long = "gap",
-        display_order = 2,
-        conflicts_with = "no_gap"
-    )]
-    pub gap: bool,
-
-    #[clap(
         name = "no_gap", 
         help = "Don't leave gap between end time of previous project and start time of the current.", 
         short = 'G', 
         long = "no-gap",
         display_order = 3,
-        conflicts_with_all = &["gap", "at"]
+        conflicts_with_all = &["at"]
     )]
     pub no_gap: bool,
 }

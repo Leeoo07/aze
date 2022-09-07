@@ -176,6 +176,10 @@ impl MyCommand for LogSubcommand {
     fn run(&self, output: super::Output) -> Result<()> {
         use mycroft::schema::frames::dsl::*;
 
+        if self.year || self.month || self.day || self.json || self.csv || self.all {
+            return Err(anyhow!("NOT IMPLEMENTED"));
+        }
+
         let mut conn = establish_connection();
 
         let collisions = self.parse_project();
@@ -191,7 +195,7 @@ impl MyCommand for LogSubcommand {
         let last_week = (Local::now() - Duration::weeks(1)).naive_utc();
         let filter_from = self.from.unwrap_or(last_week);
 
-        let tomorrow = NaiveDate::succ(&Local::today().naive_local()).and_hms(0, 0, 0);
+        let tomorrow = NaiveDate::succ(&Local::today().naive_local()).and_hms(23, 59, 59);
         let filter_end = self.to.unwrap_or(tomorrow);
 
         if filter_from > filter_end {
