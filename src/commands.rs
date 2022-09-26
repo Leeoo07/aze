@@ -1,8 +1,10 @@
 pub mod add;
+pub mod edit;
 pub mod log;
 pub mod start;
 pub mod status;
 pub mod stop;
+pub mod frames;
 
 use std::io::Write;
 

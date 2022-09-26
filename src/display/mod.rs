@@ -4,6 +4,8 @@ use chrono::{Duration, Local, NaiveDate};
 
 use crate::models::Frame;
 
+pub mod frame;
+
 #[derive(Clone)]
 pub struct Display {
     pub date: NaiveDate,

@@ -118,3 +118,38 @@ pub fn last_finished_frame() -> Option<Frame> {
 
     VecDeque::from_iter(results).pop_front()
 }
+
+pub fn last_created_frame() -> Option<Frame> {
+    use crate::schema::frames::dsl::*;
+    use std::collections::VecDeque;
+    let mut conn = establish_connection();
+
+    let results = frames
+        .filter(deleted.eq(false))
+        .order_by(last_update.desc())
+        .load::<Frame>(&mut conn)
+        .expect("Error loading frames");
+
+    VecDeque::from_iter(results).pop_front()
+}
+
+pub fn find_frame(id_string: &String) -> Result<Frame, diesel::result::Error> {
+    use crate::schema::frames::dsl::*;
+    let mut conn = establish_connection();
+
+    frames.find(id_string).first(&mut conn)
+}
+
+
+pub fn find_all() -> Vec<Frame> {
+    use crate::schema::frames::dsl::*;
+    let mut conn = establish_connection();
+
+    let results = frames
+        .filter(deleted.eq(false))
+        .order_by(last_update.desc())
+        .load::<Frame>(&mut conn)
+        .expect("Error loading frames");
+
+    return results;
+}

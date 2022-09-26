@@ -4,15 +4,17 @@ use diesel::RunQueryDsl;
 use mycroft::{
     database::MyJsonType,
     models::{Frame, NewFrame},
-    schema::frames,
+    schema::frames as schema_frames,
 };
 use uuid::Uuid;
 
 mod add;
+mod edit;
 mod log;
 mod start;
 mod status;
 mod stop;
+mod frames;
 
 pub fn add_frame(
     test_db: &TestDb,
@@ -36,7 +38,7 @@ pub fn add_frame(
         deleted: &false,
     };
     let mut conn = test_db.conn().expect("error");
-    diesel::insert_into(frames::table)
+    diesel::insert_into(schema_frames::table)
         .values(&new_frame)
         .execute(&mut conn)
         .expect("Error saving new frame");

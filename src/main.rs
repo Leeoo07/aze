@@ -4,7 +4,9 @@ use clap::Parser;
 
 use anyhow::{anyhow, Result};
 use commands::add::AddSubcommand;
+use commands::edit::EditSubcommand;
 use commands::log::LogSubcommand;
+use commands::frames::FramesSubcommand;
 use commands::start::StartSubcommand;
 use commands::status::StatusSubcommand;
 use commands::stop::StopSubcommand;
@@ -57,6 +59,8 @@ enum Commands {
     Stop(StopSubcommand),
     Status(StatusSubcommand),
     Log(LogSubcommand),
+    Edit(EditSubcommand),
+    Frames(FramesSubcommand),
 }
 
 fn main() -> Result<()> {
@@ -75,11 +79,15 @@ fn main() -> Result<()> {
     let output: Output = Output {
         out: &mut std::io::stdout(),
     };
+
+
     match args.command {
         Commands::Add(command) => command.run(output),
         Commands::Start(command) => command.run(output),
         Commands::Stop(command) => command.run(output),
         Commands::Status(command) => command.run(output),
         Commands::Log(command) => command.run(output),
+        Commands::Edit(command) => command.run(output),
+        Commands::Frames(command) => command.run(output),
     }
 }
