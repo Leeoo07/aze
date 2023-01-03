@@ -23,7 +23,7 @@ jobs:
             archive: zip
     steps:
       - uses: actions/checkout@v3
-      - run: apt install libsqlite3-dev
+      - run: sudo apt install libsqlite3-dev
       - name: Compile and release
         uses: rust-build/rust-build.action@v1.4.0
         env:
