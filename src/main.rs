@@ -10,6 +10,8 @@ use commands::frames::FramesSubcommand;
 use commands::start::StartSubcommand;
 use commands::status::StatusSubcommand;
 use commands::stop::StopSubcommand;
+use commands::projects::ProjectsSubcommand;
+use commands::remove::RemoveSubcommand;
 use commands::{MyCommand, Output};
 use mycroft::database::{establish_connection, run_migrations};
 pub mod commands;
@@ -61,6 +63,8 @@ enum Commands {
     Log(LogSubcommand),
     Edit(EditSubcommand),
     Frames(FramesSubcommand),
+    Projects(ProjectsSubcommand),
+    Remove(RemoveSubcommand)
 }
 
 fn main() -> Result<()> {
@@ -89,5 +93,7 @@ fn main() -> Result<()> {
         Commands::Log(command) => command.run(output),
         Commands::Edit(command) => command.run(output),
         Commands::Frames(command) => command.run(output),
+        Commands::Projects(command) => command.run(output),
+        Commands::Remove(command) => command.run(output),
     }
 }

@@ -4,7 +4,10 @@ use mycroft::service::frame::find_all;
 use super::MyCommand;
 
 #[derive(clap::Args, Debug)]
-#[clap(about = "Edit a frame.")]
+#[clap(
+    about = "Display the list of all frame IDs.",
+    after_help = "Example:\n\n$ mycroft frames\nf1c4815\n9d1a989\n8801ec3"
+)]
 pub struct FramesSubcommand {
 
 }

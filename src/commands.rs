@@ -5,6 +5,8 @@ pub mod start;
 pub mod status;
 pub mod stop;
 pub mod frames;
+pub mod projects;
+pub mod remove;
 
 use std::io::Write;
 

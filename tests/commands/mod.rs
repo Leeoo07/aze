@@ -15,6 +15,8 @@ mod start;
 mod status;
 mod stop;
 mod frames;
+mod projects;
+mod remove;
 
 pub fn add_frame(
     test_db: &TestDb,

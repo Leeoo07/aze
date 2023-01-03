@@ -140,6 +140,18 @@ pub fn find_frame(id_string: &String) -> Result<Frame, diesel::result::Error> {
     frames.find(id_string).first(&mut conn)
 }
 
+pub fn find_frame_by_short(id_string: &String) -> Result<Frame, diesel::result::Error> {
+    use crate::schema::frames::dsl::*;
+    let mut conn = establish_connection();
+
+    let results = frames
+        .filter(deleted.eq(false))
+        .filter(id.eq(id_string))
+        .first::<Frame>(&mut conn)
+        .expect("Error loading frames");
+
+    return results;
+}
 
 pub fn find_all() -> Vec<Frame> {
     use crate::schema::frames::dsl::*;
