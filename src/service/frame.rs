@@ -6,6 +6,7 @@ use chrono::NaiveDateTime;
 use crate::diesel::ExpressionMethods;
 use crate::diesel::QueryDsl;
 use crate::diesel::RunQueryDsl;
+use crate::diesel::TextExpressionMethods;
 
 use uuid::Uuid;
 
@@ -137,11 +138,7 @@ pub fn find_frame(id_string: &String) -> Result<Frame, diesel::result::Error> {
     use crate::schema::frames::dsl::*;
     let mut conn = establish_connection();
 
-    if id_string.len() > 7 {
-        return frames.find(id_string).first(&mut conn);
-    }
-
-    find_frame_by_short(id_string)
+    frames.find(id_string).first(&mut conn)
 }
 
 pub fn find_frame_by_short(id_string: &String) -> Result<Frame, diesel::result::Error> {
@@ -150,7 +147,7 @@ pub fn find_frame_by_short(id_string: &String) -> Result<Frame, diesel::result::
 
     let results = frames
         .filter(deleted.eq(false))
-        .filter(id.eq(id_string))
+        .filter(id.like(id_string.to_owned() + "%"))
         .first::<Frame>(&mut conn);
 
     return results;

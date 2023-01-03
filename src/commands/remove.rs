@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use anyhow::Result;
 use colored::Colorize;
 use dialoguer::Confirm;
-use aze::service::{project::find_all, frame::find_frame};
+use aze::service::{project::find_all, frame::find_frame_by_short};
 use aze::schema::frames;
 use aze::database::establish_connection;
 use crate::diesel::RunQueryDsl;
@@ -33,14 +33,14 @@ pub struct RemoveSubcommand {
 impl MyCommand for RemoveSubcommand {
     fn run(&self, output: super::Output) -> Result<()> {
 
-        let frame_un = find_frame(&self.id);
+        let frame_un = find_frame_by_short(&self.id);
 
         if frame_un.is_err() {
             return Err(anyhow!("No frame found with id {}.", self.id));
         }
 
         let frame = frame_un.unwrap();
-        if !self.force {
+        /*if !self.force {
             write!(
                 output.out,
                 "You are about to remove frame {} from {}{}",
@@ -53,7 +53,8 @@ impl MyCommand for RemoveSubcommand {
                 }
             );
         }
-        if self.force || !Confirm::new().with_prompt(", continue?",).interact()? {
+        */
+        if self.force {
 
             let update_satement = diesel::update(&frame).set((
                 frames::deleted.eq(true),

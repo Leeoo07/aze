@@ -9,7 +9,7 @@ use aze::database::MyJsonType;
 use aze::display::frame::JsonFrame;
 use aze::models::Frame;
 use aze::schema::frames;
-use aze::service::frame::find_frame;
+use aze::service::frame::find_frame_by_short;
 use aze::service::frame::frame_collides;
 use aze::service::frame::frame_start_collides;
 use aze::service::frame::last_created_frame;
@@ -48,7 +48,7 @@ impl MyCommand for EditSubcommand {
 
         if self.frame_id.is_some() {
             let frame_id = self.frame_id.as_ref().unwrap().to_string();
-            let frame_by_id = find_frame(&frame_id);
+            let frame_by_id = find_frame_by_short(&frame_id);
             if frame_by_id.is_err() {
                 return Err(anyhow!("No frame found with id {}", frame_id));
             }
