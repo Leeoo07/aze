@@ -147,8 +147,7 @@ pub fn find_frame_by_short(id_string: &String) -> Result<Frame, diesel::result::
     let results = frames
         .filter(deleted.eq(false))
         .filter(id.eq(id_string))
-        .first::<Frame>(&mut conn)
-        .expect("Error loading frames");
+        .first::<Frame>(&mut conn);
 
     return results;
 }
