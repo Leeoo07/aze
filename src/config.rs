@@ -1,4 +1,4 @@
-use std::{env, path::MAIN_SEPARATOR, fs::create_dir_all};
+use std::{env, path::{MAIN_SEPARATOR, Path}, fs::create_dir_all};
 
 use anyhow::Result;
 use confy::ConfyError;
@@ -13,6 +13,11 @@ pub struct AppConfig {
 
 impl AppConfig {
     pub fn database_url(&self) -> String {
+        let path = Path::new(&self.data_dir);
+
+        if !path.exists() {
+            create_dir_all(path).expect(&format!("Failed to create data directory {}", self.data_dir));
+        }
         let default = format!("{}{}{}", self.data_dir, MAIN_SEPARATOR, "frames.db");
 
         env::var("DATABASE_URL").unwrap_or(default)
@@ -22,9 +27,6 @@ impl AppConfig {
 impl Default for AppConfig {
     fn default() -> Self {
         if let Some(proj_dirs) = ProjectDirs::from("ch", "lethani", "aze") {
-            if !proj_dirs.data_dir().exists() {
-                create_dir_all(proj_dirs.data_dir()).expect(&format!("Failed to create data directory {}", proj_dirs.data_dir().to_str().unwrap().to_string()));
-            }
             return AppConfig {
                 data_dir: proj_dirs.data_dir().to_str().unwrap().to_string(),
                 datetime_format: "%Y-%m-%d %H:%M".to_string(),
