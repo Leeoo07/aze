@@ -1,0 +1,20 @@
+name: rust
+
+on:
+    release:
+        types: [published]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions-rs/cargo@v1
+      with:
+        use-cross: true
+        command: publish
+        args: --token ${{ secrets.CARGO_TOKEN }}

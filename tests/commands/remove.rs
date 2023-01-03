@@ -51,19 +51,19 @@ fn remove_with_id() -> Result<(), Box<dyn std::error::Error>> {
 
     let result = get_frames(&test_db);
     assert_eq!(1, result.len());
+    assert_eq!(false, result.get(0).expect("fail").deleted);
 
     let id = &result.get(0).expect("fail").id;
 
     let mut cmd = Command::cargo_bin("mycroft")?;
 
-    let p = cmd.env("DATABASE_URL", &database).stdin(Stdio::piped()).arg("remove").arg(id).spawn().unwrap();
-
-    write!(p.stdin.unwrap(), "{}", "N");
-
-
+    cmd.env("DATABASE_URL", &database).stdin(Stdio::piped()).arg("remove").arg(id).arg("--force").unwrap();
     cmd.assert()
-        .success()
-        .stdout(predicate::str::contains("No frame found with id aaaaaaa."));
+        .success();
+
+    let result = get_frames(&test_db);
+    assert_eq!(1, result.len());
+    assert_eq!(true, result.get(0).expect("fail").deleted);
 
     Ok(())
 }

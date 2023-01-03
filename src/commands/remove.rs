@@ -3,6 +3,10 @@ use anyhow::Result;
 use colored::Colorize;
 use dialoguer::Confirm;
 use mycroft::service::{project::find_all, frame::find_frame};
+use mycroft::schema::frames;
+use mycroft::database::establish_connection;
+use crate::diesel::RunQueryDsl;
+use crate::diesel::ExpressionMethods;
 
 use super::MyCommand;
 
@@ -36,19 +40,31 @@ impl MyCommand for RemoveSubcommand {
         }
 
         let frame = frame_un.unwrap();
-        write!(
-            output.out,
-            "You are about to remove frame {} from {}{}",
-            frame.project.purple(),
-            frame.start.format("d.m.Y H:M").to_string().green(),
-            if frame.end.is_some() {
-                format!(" to {}", frame.end.unwrap().format("d.m.Y H:M").to_string().green())
-            } else {
-                format!("")
+        if !self.force {
+            write!(
+                output.out,
+                "You are about to remove frame {} from {}{}",
+                frame.project.purple(),
+                frame.start.format("d.m.Y H:M").to_string().green(),
+                if frame.end.is_some() {
+                    format!(" to {}", frame.end.unwrap().format("d.m.Y H:M").to_string().green())
+                } else {
+                    format!("")
+                }
+            );
+        }
+        if self.force || !Confirm::new().with_prompt(", continue?",).interact()? {
+
+            let update_satement = diesel::update(&frame).set((
+                frames::deleted.eq(true),
+            ));
+
+            let mut conn = establish_connection();
+            let result = update_satement.execute(&mut conn);
+
+            if result.is_err() {
+                return Err(anyhow!("Could not save frame with id {}", frame.id));
             }
-        );
-        if !Confirm::new().with_prompt(", continue?",).interact()? {
-            println!("Looks like you want to continue");
         }
 
         Ok(())
