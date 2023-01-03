@@ -7,7 +7,7 @@ description = "A time tracking tool heavenly inspired by watson"
 readme = "README.md"
 homepage = "https://github.com/kreemer/mycroft"
 repository = "https://github.com/kreemer/mycroft"
-keywords = ["cli", "time tracking", "time"]
+keywords = ["cli", "timetracking", "time"]
 categories = ["command-line-utilities"]
 edition = "2021"
 
