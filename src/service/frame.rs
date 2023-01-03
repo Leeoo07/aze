@@ -137,7 +137,11 @@ pub fn find_frame(id_string: &String) -> Result<Frame, diesel::result::Error> {
     use crate::schema::frames::dsl::*;
     let mut conn = establish_connection();
 
-    frames.find(id_string).first(&mut conn)
+    if id_string.len() > 7 {
+        return frames.find(id_string).first(&mut conn);
+    }
+
+    find_frame_by_short(id_string)
 }
 
 pub fn find_frame_by_short(id_string: &String) -> Result<Frame, diesel::result::Error> {
