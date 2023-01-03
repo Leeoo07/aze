@@ -5,9 +5,9 @@ use anyhow::anyhow;
 use anyhow::Result;
 use chrono::{Local, NaiveDateTime};
 use diesel::OptionalExtension;
-use mycroft::ago;
-use mycroft::database::establish_connection;
-use mycroft::models::Frame;
+use aze::ago;
+use aze::database::establish_connection;
+use aze::models::Frame;
 
 use super::MyCommand;
 
@@ -18,7 +18,7 @@ pub struct StopSubcommand {
 
 impl MyCommand for StopSubcommand {
     fn run(&self, output: super::Output) -> Result<()> {
-        use mycroft::schema::frames::dsl::*;
+        use aze::schema::frames::dsl::*;
 
         let at = self.at;
 

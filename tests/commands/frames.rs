@@ -10,7 +10,7 @@ use super::add_frame;
 
 #[test]
 fn frames_no_frames_saved() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("frames")
         .env("DATABASE_URL", "file::memory:?cache=shared");
@@ -40,7 +40,7 @@ fn frames_frame_saved() -> Result<(), Box<dyn std::error::Error>> {
 
     let id = &result.get(0).expect("fail").id;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.env("DATABASE_URL", &database).arg("frames");
 

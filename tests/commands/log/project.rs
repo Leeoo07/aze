@@ -29,7 +29,7 @@ fn get_only_correct_project_entries() -> Result<(), Box<dyn std::error::Error>> 
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("-p")
@@ -65,7 +65,7 @@ fn get_only_correct_projects_entries() -> Result<(), Box<dyn std::error::Error>>
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("-p")
@@ -103,7 +103,7 @@ fn ignore_single_project() -> Result<(), Box<dyn std::error::Error>> {
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("--ignore-project")
@@ -139,7 +139,7 @@ fn ignore_multiple_projects() -> Result<(), Box<dyn std::error::Error>> {
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("--ignore-project")
@@ -159,7 +159,7 @@ fn ignore_multiple_projects() -> Result<(), Box<dyn std::error::Error>> {
 fn ignore_and_select_projects() -> Result<(), Box<dyn std::error::Error>> {
     let test_db = TestDb::new();
     let database = &test_db.db_path;
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("-p")

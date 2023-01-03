@@ -1,12 +1,12 @@
 [package]
-name = "mycroft"
+name = "aze"
 version = "0.1.0"
 authors = ["Kevin Studer <kreemer@me.com>"]
 license = "MIT OR Apache-2.0"
 description = "A time tracking tool heavenly inspired by watson"
 readme = "README.md"
-homepage = "https://github.com/kreemer/mycroft"
-repository = "https://github.com/kreemer/mycroft"
+homepage = "https://github.com/kreemer/aze"
+repository = "https://github.com/kreemer/aze"
 keywords = ["cli", "timetracking", "time"]
 categories = ["command-line-utilities"]
 edition = "2021"

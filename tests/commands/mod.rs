@@ -1,7 +1,7 @@
 use crate::TestDb;
 use chrono::NaiveDateTime;
 use diesel::RunQueryDsl;
-use mycroft::{
+use aze::{
     database::MyJsonType,
     models::{Frame, NewFrame},
     schema::frames as schema_frames,
@@ -50,7 +50,7 @@ pub fn add_frame(
 
 pub fn get_frames(test_db: &TestDb) -> Vec<Frame> {
     let mut conn = test_db.conn().expect("error");
-    use mycroft::schema::frames::dsl::*;
+    use aze::schema::frames::dsl::*;
 
     frames.load::<Frame>(&mut conn).expect("error")
 }

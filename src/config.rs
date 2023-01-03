@@ -21,7 +21,7 @@ impl AppConfig {
 
 impl Default for AppConfig {
     fn default() -> Self {
-        if let Some(proj_dirs) = ProjectDirs::from("ch", "lethani", "mycroft") {
+        if let Some(proj_dirs) = ProjectDirs::from("ch", "lethani", "aze") {
             return AppConfig {
                 data_dir: proj_dirs.data_dir().to_str().unwrap().to_string(),
                 datetime_format: "%Y-%m-%d %H:%M".to_string(),
@@ -33,7 +33,7 @@ impl Default for AppConfig {
 }
 
 pub fn load_config() -> AppConfig {
-    let cfg: Result<AppConfig, ConfyError> = confy::load("mycroft");
+    let cfg: Result<AppConfig, ConfyError> = confy::load("aze");
 
     cfg.unwrap_or_default()
 }
@@ -46,7 +46,7 @@ mod tests {
     fn default_config_dir() {
         let config = super::load_config();
 
-        if let Some(proj_dirs) = ProjectDirs::from("ch", "lethani", "mycroft") {
+        if let Some(proj_dirs) = ProjectDirs::from("ch", "lethani", "aze") {
             assert_eq!(
                 proj_dirs.data_dir().to_str().unwrap().to_string(),
                 config.data_dir

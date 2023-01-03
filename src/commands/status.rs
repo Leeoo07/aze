@@ -2,13 +2,13 @@ use super::MyCommand;
 use crate::config::load_config;
 use anyhow::Result;
 use colored::Colorize;
-use mycroft::ago;
-use mycroft::service::frame::last_started_frame;
+use aze::ago;
+use aze::service::frame::last_started_frame;
 
 #[derive(clap::Args, Debug)]
 #[clap(
     about = "Display when the current project and the time spent since.",
-    after_help = "Example:\n\n$ mycroft status\nProject apollo11 [brakes] started seconds ago (2014-05-19 14:32:41+0100)"
+    after_help = "Example:\n\n$ aze status\nProject apollo11 [brakes] started seconds ago (2014-05-19 14:32:41+0100)"
 )]
 pub struct StatusSubcommand {
     #[clap(

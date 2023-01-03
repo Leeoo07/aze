@@ -6,7 +6,7 @@ use crate::{commands::add_frame, TestDb};
 
 #[test]
 fn time_from_cannot_be_parsed() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", ":memory:")
         .arg("log")
         .arg("--from")
@@ -23,7 +23,7 @@ fn time_from_cannot_be_parsed() -> Result<(), Box<dyn std::error::Error>> {
 fn time_can_be_parsed_by_date() -> Result<(), Box<dyn std::error::Error>> {
     let today = NaiveDate::pred(&Local::today().naive_local());
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", "file::memory:?cache=shared")
         .arg("log")
         .arg("--from")
@@ -43,7 +43,7 @@ fn time_can_be_parsed_by_date() -> Result<(), Box<dyn std::error::Error>> {
 fn time_can_be_parsed_by_datetime() -> Result<(), Box<dyn std::error::Error>> {
     let today = NaiveDate::pred(&Local::today().naive_local());
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", "file::memory:?cache=shared")
         .arg("log")
         .arg("--from")
@@ -63,7 +63,7 @@ fn time_can_be_parsed_by_datetime() -> Result<(), Box<dyn std::error::Error>> {
 fn time_from_cannot_past_to() -> Result<(), Box<dyn std::error::Error>> {
     let day_after_tomorrow = NaiveDate::succ(&Local::today().naive_local()).succ();
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", "file::memory:?cache=shared")
         .arg("log")
         .arg("--from")
@@ -96,7 +96,7 @@ fn time_to_is_inclusive_tomorrow_default() -> Result<(), Box<dyn std::error::Err
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database).arg("log");
 
     cmd.assert()
@@ -115,7 +115,7 @@ fn time_from_searches_for_start() -> Result<(), Box<dyn std::error::Error>> {
 
     add_frame(&test_db, &"test", &start, Some(&end), None)?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("--from")
@@ -135,7 +135,7 @@ fn time_from_includes() -> Result<(), Box<dyn std::error::Error>> {
 
     add_frame(&test_db, &"test", &start, Some(&end), None)?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("--from")
@@ -157,7 +157,7 @@ fn time_to_includes() -> Result<(), Box<dyn std::error::Error>> {
 
     add_frame(&test_db, &"test", &start, Some(&end), None)?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("--from")
@@ -181,7 +181,7 @@ fn time_to_searches_for_end() -> Result<(), Box<dyn std::error::Error>> {
 
     add_frame(&test_db, &"test", &start, Some(&end), None)?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("--from")

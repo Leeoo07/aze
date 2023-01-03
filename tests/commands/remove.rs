@@ -10,7 +10,7 @@ use super::add_frame;
 
 #[test]
 fn remove_no_id_given() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("remove")
         .env("DATABASE_URL", "file::memory:?cache=shared");
@@ -23,7 +23,7 @@ fn remove_no_id_given() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn remove_with_id_nonexistent() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("remove")
         .arg("aaaaaaa")
@@ -55,7 +55,7 @@ fn remove_with_id() -> Result<(), Box<dyn std::error::Error>> {
 
     let id = &result.get(0).expect("fail").id;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.env("DATABASE_URL", &database).stdin(Stdio::piped()).arg("remove").arg(id).arg("--force").unwrap();
     cmd.assert()

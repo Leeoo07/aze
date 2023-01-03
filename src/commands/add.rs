@@ -2,19 +2,19 @@ use anyhow::anyhow;
 use anyhow::Result;
 use chrono::NaiveDateTime;
 use colored::Colorize;
-use mycroft::cli::convert_tags;
-use mycroft::cli::parse_to_datetime;
-use mycroft::cli::process_project;
-use mycroft::cli::process_tags;
-use mycroft::service::frame::create_frame;
-use mycroft::service::frame::frame_collides;
+use aze::cli::convert_tags;
+use aze::cli::parse_to_datetime;
+use aze::cli::process_project;
+use aze::cli::process_tags;
+use aze::service::frame::create_frame;
+use aze::service::frame::frame_collides;
 
 use super::MyCommand;
 
 #[derive(clap::Args, Debug)]
 #[clap(
     about = "Add time to a project with tag(s) that was not tracked live.",
-    after_help = "Example:\n\n$ mycroft add --from \"2018-03-20 12:00:00\" --to \"2018-03-20 13:00:00\" \\ \n programming +addfeature"
+    after_help = "Example:\n\n$ aze add --from \"2018-03-20 12:00:00\" --to \"2018-03-20 13:00:00\" \\ \n programming +addfeature"
 )]
 pub struct AddSubcommand {
     #[clap(help = "Name of the project which should be used to add time.")]

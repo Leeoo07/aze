@@ -2,21 +2,21 @@ use anyhow::anyhow;
 use anyhow::Result;
 use chrono::{Local, NaiveDateTime};
 use colored::Colorize;
-use mycroft::cli::convert_tags;
-use mycroft::cli::parse_to_datetime;
-use mycroft::cli::process_project;
-use mycroft::cli::process_tags;
-use mycroft::service::frame::frame_start_collides;
-use mycroft::service::frame::last_finished_frame;
-use mycroft::service::frame::last_started_frame;
-use mycroft::service::frame::start_frame;
+use aze::cli::convert_tags;
+use aze::cli::parse_to_datetime;
+use aze::cli::process_project;
+use aze::cli::process_tags;
+use aze::service::frame::frame_start_collides;
+use aze::service::frame::last_finished_frame;
+use aze::service::frame::last_started_frame;
+use aze::service::frame::start_frame;
 
 use super::MyCommand;
 
 #[derive(clap::Args, Debug)]
 #[clap(
     about = "Start monitoring time for the given project.",
-    after_help = "Example:\n\n$ mycroft start apollo11 +module +brakes --no-gap\nStarting project apollo11 [module, brakes] at 16:34"
+    after_help = "Example:\n\n$ aze start apollo11 +module +brakes --no-gap\nStarting project apollo11 [module, brakes] at 16:34"
 )]
 pub struct StartSubcommand {
     #[clap(help = "Name of the project which should be used to add time.")]

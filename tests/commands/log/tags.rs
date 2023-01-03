@@ -28,7 +28,7 @@ fn get_only_correct_tag_entries() -> Result<(), Box<dyn std::error::Error>> {
         Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
         Some(vec!["test2".to_string()]),
     )?;
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("-T")
@@ -64,7 +64,7 @@ fn get_only_correct_tags_entries() -> Result<(), Box<dyn std::error::Error>> {
         Some(vec!["test2".to_string()]),
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("-T")
@@ -102,7 +102,7 @@ fn ignore_single_tag() -> Result<(), Box<dyn std::error::Error>> {
         Some(vec!["test2".to_string()]),
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("--ignore-tag")
@@ -138,7 +138,7 @@ fn ignore_multiple_tags() -> Result<(), Box<dyn std::error::Error>> {
         Some(vec!["test2".to_string()]),
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("--ignore-tag")
@@ -158,7 +158,7 @@ fn ignore_multiple_tags() -> Result<(), Box<dyn std::error::Error>> {
 fn ignore_and_select_tags() -> Result<(), Box<dyn std::error::Error>> {
     let test_db = TestDb::new();
     let database = &test_db.db_path;
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("-T")
@@ -194,7 +194,7 @@ fn get_entries_from_multiple_tags() -> Result<(), Box<dyn std::error::Error>> {
         Some(&NaiveDateTime::from_timestamp(end + 3600, 0)),
         Some(vec!["test2".to_string(), "test3".to_string()]),
     )?;
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("-T")

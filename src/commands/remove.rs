@@ -2,9 +2,9 @@ use anyhow::anyhow;
 use anyhow::Result;
 use colored::Colorize;
 use dialoguer::Confirm;
-use mycroft::service::{project::find_all, frame::find_frame};
-use mycroft::schema::frames;
-use mycroft::database::establish_connection;
+use aze::service::{project::find_all, frame::find_frame};
+use aze::schema::frames;
+use aze::database::establish_connection;
 use crate::diesel::RunQueryDsl;
 use crate::diesel::ExpressionMethods;
 

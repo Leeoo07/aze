@@ -10,7 +10,7 @@ use super::add_frame;
 
 #[test]
 fn stop_no_project_started() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("stop")
         .env("DATABASE_URL", "file::memory:?cache=shared");
@@ -28,7 +28,7 @@ fn stop_is_stopping_project() -> Result<(), Box<dyn std::error::Error>> {
 
     add_frame(&test_db, &"test", &Local::now().naive_local(), None, None)?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.env("DATABASE_URL", &database).arg("stop");
 

@@ -4,16 +4,16 @@ use anyhow::anyhow;
 use anyhow::Result;
 use chrono::NaiveDateTime;
 use colored::Colorize;
-use mycroft::database::establish_connection;
-use mycroft::database::MyJsonType;
-use mycroft::display::frame::JsonFrame;
-use mycroft::models::Frame;
-use mycroft::schema::frames;
-use mycroft::service::frame::find_frame;
-use mycroft::service::frame::frame_collides;
-use mycroft::service::frame::frame_start_collides;
-use mycroft::service::frame::last_created_frame;
-use mycroft::service::frame::last_started_frame;
+use aze::database::establish_connection;
+use aze::database::MyJsonType;
+use aze::display::frame::JsonFrame;
+use aze::models::Frame;
+use aze::schema::frames;
+use aze::service::frame::find_frame;
+use aze::service::frame::frame_collides;
+use aze::service::frame::frame_start_collides;
+use aze::service::frame::last_created_frame;
+use aze::service::frame::last_started_frame;
 
 use super::MyCommand;
 

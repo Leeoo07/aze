@@ -1,4 +1,4 @@
-# mycroft
+# aze
 
 A time tracking tool heavenly inspired by watson.
 
@@ -6,14 +6,14 @@ A time tracking tool heavenly inspired by watson.
 
 ### Installation
 
-Simply download the binary from the [Release](https://github.com/kreemer/mycroft/releases/) page.
+Simply download the binary from the [Release](https://github.com/kreemer/aze/releases/) page.
 
 ### Usage
 
 Start tracking your time analogous to watson:
 
 ```console
-$ mycroft start universe-domination +dog
+$ aze start universe-domination +dog
 ```
 
 With this command you started a new activity `universe-domination` with the tag `dog`.
@@ -21,19 +21,19 @@ With this command you started a new activity `universe-domination` with the tag 
 You can stop your tracked project with:
 
 ```console
-$ mycroft stop
+$ aze stop
 ```
 
 You can view your tracked projects with:
 
 ```console
-$ mycroft log
+$ aze log
 ```
 
 Please read the additional documentation with:
 
 ```console
-$ mycroft help
+$ aze help
 ```
 
 ## Internals

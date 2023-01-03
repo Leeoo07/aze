@@ -1,13 +1,13 @@
 use anyhow::Result;
 use colored::Colorize;
-use mycroft::service::project::find_all;
+use aze::service::project::find_all;
 
 use super::MyCommand;
 
 #[derive(clap::Args, Debug)]
 #[clap(
     about = "Display the list of all the existing projectst.",
-    after_help = "Example:\n\n$ mycroft projects\napollo11\nhubble\nvoyager1\nvoyager2"
+    after_help = "Example:\n\n$ aze projects\napollo11\nhubble\nvoyager1\nvoyager2"
 )]
 pub struct ProjectsSubcommand {
 

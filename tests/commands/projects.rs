@@ -10,7 +10,7 @@ use super::add_frame;
 
 #[test]
 fn projects_no_frames_saved() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("projects")
         .env("DATABASE_URL", "file::memory:?cache=shared");
@@ -35,7 +35,7 @@ fn projects_frame_saved() -> Result<(), Box<dyn std::error::Error>> {
     )?;
 
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.env("DATABASE_URL", &database).arg("projects");
 
@@ -68,7 +68,7 @@ fn projects_frames_saved() -> Result<(), Box<dyn std::error::Error>> {
     )?;
 
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.env("DATABASE_URL", &database).arg("projects");
 

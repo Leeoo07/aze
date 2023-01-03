@@ -13,14 +13,14 @@ use commands::stop::StopSubcommand;
 use commands::projects::ProjectsSubcommand;
 use commands::remove::RemoveSubcommand;
 use commands::{MyCommand, Output};
-use mycroft::database::{establish_connection, run_migrations};
+use aze::database::{establish_connection, run_migrations};
 pub mod commands;
 mod config;
 
 #[derive(Debug, Parser)]
-#[clap(name = "Mycroft")]
+#[clap(name = "aze")]
 #[clap(
-    about = "Mycroft is a tool aimed at helping you monitoring your time.\n\nYou just have to tell Mycroft when you start working on your project with the `start` command, and you can stop the timer when you're done with the `stop` command."
+    about = "aze is a tool aimed at helping you monitoring your time.\n\nYou just have to tell aze when you start working on your project with the `start` command, and you can stop the timer when you're done with the `stop` command."
 )]
 struct Cli {
     #[clap(

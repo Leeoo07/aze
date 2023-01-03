@@ -7,7 +7,7 @@ use crate::{commands::get_frames, TestDb};
 
 #[test]
 fn add_without_arguments() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("add")
         .env("DATABASE_URL", "file::memory:?cache=shared");
@@ -20,7 +20,7 @@ fn add_without_arguments() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn add_frame_with_correct_argument() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("add")
         .env("DATABASE_URL", "file::memory:?cache=shared")
@@ -40,7 +40,7 @@ fn add_frame_with_correct_argument() -> Result<(), Box<dyn std::error::Error>> {
 fn start_in_overlapping_frame_returns_in_error() -> Result<(), Box<dyn std::error::Error>> {
     let test_db = TestDb::new();
     let database = &test_db.db_path;
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("add")
         .env("DATABASE_URL", &database)
@@ -53,7 +53,7 @@ fn start_in_overlapping_frame_returns_in_error() -> Result<(), Box<dyn std::erro
         "starting project test from 2000-01-01 12:00 to 2000-01-01 16:00",
     ));
 
-    cmd = Command::cargo_bin("mycroft")?;
+    cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("add")
         .env("DATABASE_URL", &database)
@@ -76,7 +76,7 @@ fn start_in_overlapping_frame_returns_in_error() -> Result<(), Box<dyn std::erro
 fn end_in_overlapping_frame_returns_in_error() -> Result<(), Box<dyn std::error::Error>> {
     let test_db = TestDb::new();
     let database = &test_db.db_path;
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("add")
         .env("DATABASE_URL", &database)
@@ -89,7 +89,7 @@ fn end_in_overlapping_frame_returns_in_error() -> Result<(), Box<dyn std::error:
         "starting project test from 2000-01-01 12:00 to 2000-01-01 16:00",
     ));
 
-    cmd = Command::cargo_bin("mycroft")?;
+    cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("add")
         .env("DATABASE_URL", &database)
@@ -112,7 +112,7 @@ fn end_in_overlapping_frame_returns_in_error() -> Result<(), Box<dyn std::error:
 fn start_and_end_in_overlapping_frame_returns_in_error() -> Result<(), Box<dyn std::error::Error>> {
     let test_db = TestDb::new();
     let database = &test_db.db_path;
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("add")
         .env("DATABASE_URL", &database)
@@ -125,7 +125,7 @@ fn start_and_end_in_overlapping_frame_returns_in_error() -> Result<(), Box<dyn s
         "starting project test from 2000-01-01 12:00 to 2000-01-01 16:00",
     ));
 
-    cmd = Command::cargo_bin("mycroft")?;
+    cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("add")
         .env("DATABASE_URL", &database)
@@ -148,7 +148,7 @@ fn start_and_end_in_overlapping_frame_returns_in_error() -> Result<(), Box<dyn s
 fn adding_tags_to_frames() -> Result<(), Box<dyn std::error::Error>> {
     let test_db = TestDb::new();
     let database = &test_db.db_path;
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("add")
         .env("DATABASE_URL", &database)
@@ -183,7 +183,7 @@ fn adding_tags_to_frames() -> Result<(), Box<dyn std::error::Error>> {
 fn frames_are_saved_to_database() -> Result<(), Box<dyn std::error::Error>> {
     let test_db = TestDb::new();
     let database = &test_db.db_path;
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("add")
         .env("DATABASE_URL", &database)

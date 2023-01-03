@@ -2,7 +2,7 @@ use diesel::{
     r2d2::{self, ConnectionManager, Pool, PooledConnection},
     SqliteConnection,
 };
-use mycroft::database::run_migrations;
+use aze::database::run_migrations;
 
 mod commands;
 

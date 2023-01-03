@@ -8,10 +8,10 @@ use chrono::NaiveDateTime;
 use diesel::associations::HasTable;
 use diesel::dsl::not;
 use diesel::TextExpressionMethods;
-use mycroft::cli::parse_to_datetime;
-use mycroft::database::establish_connection;
-use mycroft::display::Display;
-use mycroft::models::Frame;
+use aze::cli::parse_to_datetime;
+use aze::database::establish_connection;
+use aze::display::Display;
+use aze::models::Frame;
 
 use crate::diesel::ExpressionMethods;
 use crate::diesel::QueryDsl;
@@ -174,7 +174,7 @@ impl LogSubcommand {
 
 impl MyCommand for LogSubcommand {
     fn run(&self, output: super::Output) -> Result<()> {
-        use mycroft::schema::frames::dsl::*;
+        use aze::schema::frames::dsl::*;
 
         if self.year || self.month || self.day || self.json || self.csv || self.all {
             return Err(anyhow!("NOT IMPLEMENTED"));

@@ -18,7 +18,7 @@ fn nothing_if_no_entries() -> Result<(), Box<dyn std::error::Error>> {
     let dir = tempdir()?;
     let database = dir.path().join("database.db");
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.arg("log").env("DATABASE_URL", &database);
 
     cmd.assert().success().stdout(predicate::str::is_empty());
@@ -39,7 +39,7 @@ fn entry_from_this_day() -> Result<(), Box<dyn std::error::Error>> {
 
     add_frame(&test_db, &"test", &dt_start, Some(&dt_end), None)?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.arg("log").env("DATABASE_URL", &database);
 
     cmd.assert()
@@ -62,7 +62,7 @@ fn entry_from_last_two_weeks_default_not_shown() -> Result<(), Box<dyn std::erro
 
     add_frame(&test_db, &"test", &dt_start, Some(&dt_end), None)?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.arg("log").env("DATABASE_URL", &database);
 
     cmd.assert().success().stdout(predicate::str::is_empty());
@@ -92,7 +92,7 @@ fn duration_correctly_calculated() -> Result<(), Box<dyn std::error::Error>> {
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.arg("log").env("DATABASE_URL", &database);
 
     cmd.assert()
@@ -117,7 +117,7 @@ fn entries_does_not_cover_current_frame() -> Result<(), Box<dyn std::error::Erro
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database).arg("log");
 
     cmd.assert().success().stdout(predicate::str::is_empty());
@@ -139,7 +139,7 @@ fn entries_cover_current_frame_if_requested() -> Result<(), Box<dyn std::error::
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database).arg("log").arg("-c");
 
     cmd.assert()
@@ -171,7 +171,7 @@ fn order_newest_top() -> Result<(), Box<dyn std::error::Error>> {
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database).arg("log").arg("-c");
 
     cmd.assert().success();
@@ -206,7 +206,7 @@ fn order_oldest_top() -> Result<(), Box<dyn std::error::Error>> {
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
     cmd.env("DATABASE_URL", &database)
         .arg("log")
         .arg("-c")

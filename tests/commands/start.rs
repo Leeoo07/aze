@@ -10,7 +10,7 @@ use super::add_frame;
 
 #[test]
 fn start_requires_project() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.arg("start")
         .env("DATABASE_URL", "file::memory:?cache=shared");
@@ -23,7 +23,7 @@ fn start_requires_project() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn start_with_project() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.env("DATABASE_URL", "file::memory:?cache=shared")
         .arg("start")
@@ -48,7 +48,7 @@ fn start_with_project_but_already_started() -> Result<(), Box<dyn std::error::Er
         None,
     )?;
 
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.env("DATABASE_URL", &database).arg("start").arg("test");
 
@@ -61,7 +61,7 @@ fn start_with_project_but_already_started() -> Result<(), Box<dyn std::error::Er
 
 #[test]
 fn start_project_with_tags() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("mycroft")?;
+    let mut cmd = Command::cargo_bin("aze")?;
 
     cmd.env("DATABASE_URL", "file::memory:?cache=shared")
         .arg("start")
